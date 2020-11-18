@@ -76,7 +76,7 @@ class SearchEngine(object):
     endpoint = 'https://api.spotify.com/v1/search'
 
     header = {
-        'Authorization': f'Bearer {ClientAuth.get_access_token()}'
+        'Authorization': f'Bearer {ClientAuth.get_access_token(self)}'
     }
 
     def get_type_query():
