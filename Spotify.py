@@ -129,13 +129,11 @@ class SearchEngine(object):
     search_type_query = get_type_query()
     search_field_query = get_search_field()
 
-    search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
-
-    # print(search_query)
-
     endpoint = 'https://api.spotify.com/v1/search'
+    search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
     lookup_url = f'{endpoint}?{search_query}'
 
+    # print(search_query)
     # print(lookup_url)
 
     r2 = requests.get(lookup_url, headers=header)
