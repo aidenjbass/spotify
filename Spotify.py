@@ -3,10 +3,8 @@ import datetime
 import requests
 from urllib.parse import urlencode
 
-import self as self
 
-
-class ClientAuth:
+class ClientAuth(object):
     token = None
     token_expires_at = datetime.datetime.now()
     token_has_expired = True
@@ -71,18 +69,15 @@ class ClientAuth:
         elif token is None:
             self.authenticate()
             return self.get_access_token()
-#        return token
+        return token
 
 
-class SearchEngine:
+class SearchEngine(object):
+    endpoint = 'https://api.spotify.com/v1/search'
 
     header = {
         'Authorization': f'Bearer {ClientAuth.get_access_token()}'
     }
-
-    def get_search_endpoint():
-        endpoint = 'https://api.spotify.com/v1/search'
-        return endpoint
 
     def get_type_query():
         option = None
@@ -125,7 +120,7 @@ class SearchEngine:
     search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
     # print(search_query)
 
-    lookup_url = f'{get_search_endpoint()}?{search_query}'
+    lookup_url = f'{endpoint}?{search_query}'
     # print(lookup_url)
 
     r2 = requests.get(lookup_url, headers=header)
