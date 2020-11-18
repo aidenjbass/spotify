@@ -69,62 +69,69 @@ class ClientAuth(object):
         elif token is None:
             self.authenticate()
             return self.get_access_token()
-        return token
+        else:
+            return token
 
 
-class SearchEngine(object):
-    endpoint = 'https://api.spotify.com/v1/search'
+self = ClientAuth.__init__(self, client_id=ClientAuth.client_id, client_secret=ClientAuth.client_secret)
 
-    header = {
-        'Authorization': f'Bearer {ClientAuth.get_access_token(self)}'
-    }
+header = {
+    'Authorization': f'Bearer {ClientAuth.get_access_token(self)}'
+}
 
-    def get_type_query():
-        option = None
-        option_limit = 4
-        while option not in range(1, 3):
-            try:
-                option = int(input('1. Album\n'
-                                   '2. Artist\n'
-                                   '3. Track \n'
-                                   'Choose a number : '))
-                if option >= option_limit:
-                    print('Not an option')
-                elif option == 1:
-                    print('Selected Album')
-                    type_query = 'album'
-                    return type_query
-                elif option == 2:
-                    print('Selected Artist')
-                    type_query = 'artist'
-                    return type_query
-                elif option == 3:
-                    print('Selected Track')
-                    type_query = 'track'
-                    return type_query
-                else:
-                    pass
-            except ValueError:
-                print('Not an int')
-
-    def get_search_field():
-        try:
-            search_field = str(input('What would you like to search for? : '))
-            return search_field
-        except ValueError:
-            print('invalid')
-
-    search_type_query = get_type_query()
-    search_field_query = get_search_field()
-
-    search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
-    # print(search_query)
-
-    lookup_url = f'{endpoint}?{search_query}'
-    # print(lookup_url)
-
-    r2 = requests.get(lookup_url, headers=header)
-
-    # print(r2.status_code)
-    print(r2.json())
-    print(header)
+# class SearchEngine(object):
+#     endpoint = 'https://api.spotify.com/v1/search'
+#
+#     header = {
+#         'Authorization': f'Bearer {ClientAuth.get_access_token()}'
+#     }
+#
+#     def get_type_query():
+#         option = None
+#         option_limit = 4
+#         while option not in range(1, 3):
+#             try:
+#                 option = int(input('1. Album\n'
+#                                    '2. Artist\n'
+#                                    '3. Track \n'
+#                                    'Choose a number : '))
+#                 if option >= option_limit:
+#                     print('Not an option')
+#                 elif option == 1:
+#                     print('Selected Album')
+#                     type_query = 'album'
+#                     return type_query
+#                 elif option == 2:
+#                     print('Selected Artist')
+#                     type_query = 'artist'
+#                     return type_query
+#                 elif option == 3:
+#                     print('Selected Track')
+#                     type_query = 'track'
+#                     return type_query
+#                 else:
+#                     pass
+#             except ValueError:
+#                 print('Not an int')
+#
+#     def get_search_field():
+#         try:
+#             search_field = str(input('What would you like to search for? : '))
+#             return search_field
+#         except ValueError:
+#             print('invalid')
+#
+#     search_type_query = get_type_query()
+#     search_field_query = get_search_field()
+#
+#     search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
+#     # print(search_query)
+#
+#     lookup_url = f'{endpoint}?{search_query}'
+#     # print(lookup_url)
+#
+#     r2 = requests.get(lookup_url, headers=header)
+#
+#     # print(r2.status_code)
+#     print(r2.json())
+#     print(header)
