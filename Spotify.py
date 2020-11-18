@@ -3,6 +3,9 @@ import datetime
 import requests
 from urllib.parse import urlencode
 
+cid = '06f1f688ba144e21b3594f8dddc4a35c'
+secret = 'bd81aa1b4e814cc7915c03839af073bd'
+
 
 class ClientAuth(object):
     token = None
@@ -10,8 +13,8 @@ class ClientAuth(object):
     token_has_expired = True
     token_url = "https://accounts.spotify.com/api/token"
 
-    client_id = '06f1f688ba144e21b3594f8dddc4a35c'
-    client_secret = 'bd81aa1b4e814cc7915c03839af073bd'
+    client_id = None
+    client_secret = None
 
     def __init__(self, client_id, client_secret):
         self.client_id = client_id
@@ -73,65 +76,69 @@ class ClientAuth(object):
             return token
 
 
-self = ClientAuth.__init__(self, client_id=ClientAuth.client_id, client_secret=ClientAuth.client_secret)
+class SearchEngine(object):
+    CHANGEME = ClientAuth(cid, secret)
+    CHANGEME.authenticate()
+    token = CHANGEME.get_access_token()
 
-header = {
-    'Authorization': f'Bearer {ClientAuth.get_access_token(self)}'
-}
+    # print(token)
 
-# class SearchEngine(object):
-#     endpoint = 'https://api.spotify.com/v1/search'
-#
-#     header = {
-#         'Authorization': f'Bearer {ClientAuth.get_access_token()}'
-#     }
-#
-#     def get_type_query():
-#         option = None
-#         option_limit = 4
-#         while option not in range(1, 3):
-#             try:
-#                 option = int(input('1. Album\n'
-#                                    '2. Artist\n'
-#                                    '3. Track \n'
-#                                    'Choose a number : '))
-#                 if option >= option_limit:
-#                     print('Not an option')
-#                 elif option == 1:
-#                     print('Selected Album')
-#                     type_query = 'album'
-#                     return type_query
-#                 elif option == 2:
-#                     print('Selected Artist')
-#                     type_query = 'artist'
-#                     return type_query
-#                 elif option == 3:
-#                     print('Selected Track')
-#                     type_query = 'track'
-#                     return type_query
-#                 else:
-#                     pass
-#             except ValueError:
-#                 print('Not an int')
-#
-#     def get_search_field():
-#         try:
-#             search_field = str(input('What would you like to search for? : '))
-#             return search_field
-#         except ValueError:
-#             print('invalid')
-#
-#     search_type_query = get_type_query()
-#     search_field_query = get_search_field()
-#
-#     search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
-#     # print(search_query)
-#
-#     lookup_url = f'{endpoint}?{search_query}'
-#     # print(lookup_url)
-#
-#     r2 = requests.get(lookup_url, headers=header)
-#
-#     # print(r2.status_code)
-#     print(r2.json())
-#     print(header)
+    header = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    # print(header)
+
+    # noinspection PyMethodParameters,PyMethodMayBeStatic
+    def get_type_query():
+        option = None
+        option_limit = 4
+        while option not in range(1, 3):
+            try:
+                option = int(input('1. Album\n'
+                                   '2. Artist\n'
+                                   '3. Track \n'
+                                   'Choose a number : '))
+                if option >= option_limit:
+                    print('Not an option')
+                elif option == 1:
+                    print('Selected Album')
+                    type_query = 'album'
+                    return type_query
+                elif option == 2:
+                    print('Selected Artist')
+                    type_query = 'artist'
+                    return type_query
+                elif option == 3:
+                    print('Selected Track')
+                    type_query = 'track'
+                    return type_query
+                else:
+                    pass
+            except ValueError:
+                print('Not an int')
+
+    # noinspection PyMethodParameters,PyMethodMayBeStatic
+    def get_search_field():
+        try:
+            search_field = str(input('What would you like to search for? : '))
+            return search_field
+        except ValueError:
+            print('invalid')
+
+    search_type_query = get_type_query()
+    search_field_query = get_search_field()
+
+    search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
+
+    # print(search_query)
+
+    endpoint = 'https://api.spotify.com/v1/search'
+    lookup_url = f'{endpoint}?{search_query}'
+
+    # print(lookup_url)
+
+    r2 = requests.get(lookup_url, headers=header)
+
+    # print(r2.status_code)
+    print(r2.json())
