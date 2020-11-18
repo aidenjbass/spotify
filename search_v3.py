@@ -60,7 +60,7 @@ def get_type_query():
             option = int(input('1. Album\n'
                                '2. Artist\n'
                                '3. Track \n'
-                               'Choose an Option : '))
+                               'Choose a number : '))
             if option >= option_limit:
                 print('Not an option')
             elif option == 1:
@@ -81,18 +81,24 @@ def get_type_query():
             print('Not an int')
 
 
-# get_type_query()
+def get_search_field():
+    try:
+        search_field = str(input('What would you like to search for? : '))
+        return search_field
+    except ValueError:
+        print('invalid')
+
+
 search_type_query = get_type_query()
+search_field_query = get_search_field()
 
-search_field = input('What would you like to search for? : ')
-
-search_query = urlencode({'q': f'{search_field}', 'type': f'{search_type_query}', 'limit': '1'})
-print(search_query)
+search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
+# print(search_query)
 
 lookup_url = f'{endpoint}?{search_query}'
-print(lookup_url)
+# print(lookup_url)
 
 r2 = requests.get(lookup_url, headers=header)
 
-print(r2.status_code)
+# print(r2.status_code)
 print(r2.json())
