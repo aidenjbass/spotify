@@ -8,7 +8,7 @@ client_secret = 'bd81aa1b4e814cc7915c03839af073bd'  # given by spotify api dashb
 client_credentials = f'{client_id}:{client_secret}'
 client_credentials_base64 = base64.b64encode(client_credentials.encode())  # as seen below, base64 is required
 
-print(client_credentials_base64)  # test
+print(client_credentials_base64)  # test 2
 
 access_token_url = 'https://accounts.spotify.com/api/token'  # this is the endpoint given by the spotify API
 
