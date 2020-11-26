@@ -1,11 +1,15 @@
+# external imports
 import base64
 import datetime
 import requests
 from urllib.parse import urlencode
-from frontend import *
 
-cid = '06f1f688ba144e21b3594f8dddc4a35c'
-secret = 'bd81aa1b4e814cc7915c03839af073bd'
+# project imports
+import frontend
+import secrets
+
+cid = secrets.spotify_cid
+secret = secrets.spotify_csecret
 
 
 class ClientAuth(object):
@@ -127,7 +131,7 @@ class SearchEngine(object):
 
     search_type_query = get_type_query()
     # search_field_query = get_search_field()
-    search_field_query = get_search_field_from_frontend()
+    search_field_query = frontend.get_search_field_from_frontend()
 
     endpoint = 'https://api.spotify.com/v1/search'
     search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
