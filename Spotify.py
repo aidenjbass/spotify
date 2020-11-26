@@ -116,15 +116,13 @@ class SearchEngine(object):
                 else:
                     pass
             except ValueError:
-                print('Not an int')
+                print('Not an option')
 
     # noinspection PyMethodParameters,PyMethodMayBeStatic
     def get_search_field():
-        try:
-            search_field = str(input('What would you like to search for? : '))
-            return search_field
-        except ValueError:
-            print('invalid')
+        search_field = str(input('What would you like to search for? : '))
+        return search_field
+    # function unfinished, will add string validation later on
 
     search_type_query = get_type_query()
     search_field_query = get_search_field()
