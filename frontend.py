@@ -2,6 +2,7 @@ import tkinter as tk
 
 
 def get_search_field_from_frontend(button_input):
+    # test function to interact tkinter with backend script Spotify.py
     if button_input == 'album':
         search_field = button_input
         print(search_field)
@@ -46,3 +47,7 @@ button_track.pack()
 
 # end of widgets
 base.mainloop()
+
+'''
+End of GUI
+'''
