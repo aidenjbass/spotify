@@ -5,7 +5,6 @@ import requests
 from urllib.parse import urlencode
 
 # project imports
-import frontend
 import secrets
 
 cid = secrets.spotify_cid
@@ -56,7 +55,9 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
         token_data = self.get_token_data()
         token_headers = self.get_token_header()
         # calls API to retrieve the client token used throughout the program later on to interact with API
-        r1 = requests.post(access_token_url, data=token_data, headers=token_headers)
+        r1 = requests.post(access_token_url,
+                           data=token_data,
+                           headers=token_headers)
         valid_request = r1.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
             raise Exception('Authetication failed')
@@ -86,9 +87,9 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
 
 
 class SearchEngine(object):
-    CHANGEME = ClientAuth(cid, secret)
-    CHANGEME.authenticate()
-    token = CHANGEME.get_access_token()
+    InvokeAuthFromClient = ClientAuth(cid, secret)
+    InvokeAuthFromClient.authenticate()
+    token = InvokeAuthFromClient.get_access_token()
 
     # print(token)
 
@@ -150,7 +151,9 @@ class SearchEngine(object):
 
     endpoint = 'https://api.spotify.com/v1/search'  # API endpoint to search API
     # parses search_query with option category and chosen search from option category
-    search_query = urlencode({'q': f'{search_field_query}', 'type': f'{search_type_query}', 'limit': '1'})
+    search_query = urlencode({'q': f'{search_field_query}',
+                              'type': f'{search_type_query}',
+                              'limit': '1'})
     lookup_url = f'{endpoint}?{search_query}'
 
     # print(search_query)
