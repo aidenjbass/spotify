@@ -75,13 +75,13 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
         token = self.token
         expires_at = self.token_expires_at  # gives the DD/MM/YYYY HH:MM:SS format of when token expires
         now = datetime.datetime.now()
-        if expires_at < now:  # if when the token expires is before NOW, token is invalid and must be reauthenticated
+        if expires_at < now:  # if when the token expires is before NOW, token is invalid and must be re-authenticated
             self.authenticate()
             return self.get_access_token()
-        elif token is None:  # if the token variable is 'None' or 'Null', must be reauthenticated
+        elif token is None:  # if the token variable is 'None' or 'Null', must be re-authenticated
             self.authenticate()
             return self.get_access_token()
-        else:  # otherwise, if the token is valid, not None and is later than time NOW, reauthentication is not needed
+        else:  # otherwise, if the token is valid, not None and is later than time NOW, re-authentication is not needed
             return token
 
 
@@ -108,8 +108,8 @@ class SearchEngine(object):
         option_limit = 4
         while option not in range(1, 3):  # any input that is not an int between 1 and 3 is invalid
             try:
-                option = int(input('1. Album\n'
-                                   '2. Artist\n'
+                option = int(input('1. Album \n'
+                                   '2. Artist \n'
                                    '3. Track \n'
                                    'Choose a number : '))
                 if option >= option_limit:
