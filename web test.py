@@ -1,3 +1,3 @@
 import webview
-webview.create_window('Hello world', 'https://pywebview.flowrl.com/hello')
+webview.create_window('Spotify Authentication', 'https://blazingcreeperx.github.io//')
 webview.start()
