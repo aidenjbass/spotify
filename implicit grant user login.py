@@ -18,15 +18,12 @@ get_redirect_uri = {'redirect_uri': 'https://blazingcreeperx.github.io/'}
 get_show_dialog = {'show_dialog': 'True'}
 
 access_token_url = token_url
-token_data = (
+token_header = (
     get_client_id,
     get_response_type,
     get_redirect_uri,
     get_show_dialog
 )
-r1 = requests.get(
-    access_token_url,
-    token_data
-)
+r1 = requests.get(access_token_url, headers=token_header)
 print(r1)
 
