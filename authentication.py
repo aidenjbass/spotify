@@ -27,18 +27,19 @@ print(token_header)
 
 r1 = requests.post(access_token_url, data=token_data, headers=token_header)
 
-print(r1.json())
+print(access_token_url, token_data, token_header)
+# print(r1.json())
 
 valid_request = r1.status_code in range(200, 299)
 
-print(valid_request)
+# print(valid_request)
 
 token_response_data = r1.json()
 now = datetime.datetime.now()
 expires_in = token_response_data['expires_in']  # in seconds
 expires_at = now + datetime.timedelta(seconds=expires_in)
 
-print(expires_at)
+# print(expires_at)
 
 # token = token_response_data['access_token']
 # print(token)

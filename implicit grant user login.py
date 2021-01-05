@@ -1,35 +1,32 @@
+# external imports
+import requests
+
 # project imports
 import secrets
 
 cid = secrets.spotify_cid
 
+token_url = 'https://accounts.spotify.com/authorize'
+client_id = cid
 
-class ImplicitGrant(object):
-    # constant setting
-    client_id = cid
+get_client_id = {'client_id': client_id}
 
-    def __init__(self, client_id):
-        self.client_id = client_id
+get_response_type = {'response_type': 'token'}
 
-    def get_client_id(self):
-        return {
-            'client_id': self.client_id
-        }
+get_redirect_uri = {'redirect_uri': 'https://blazingcreeperx.github.io/'}
 
-    @staticmethod
-    def get_response_type():
-        return {
-            'response_type': 'token'
-        }
+get_show_dialog = {'show_dialog': 'True'}
 
-    @staticmethod
-    def get_redirect_uri():
-        return {
-            'redirect_uri': 'https://blazingcreeperx.github.io/'
-        }
+access_token_url = token_url
+token_data = (
+    get_client_id,
+    get_response_type,
+    get_redirect_uri,
+    get_show_dialog
+)
+r1 = requests.get(
+    access_token_url,
+    token_data
+)
+print(r1)
 
-    @staticmethod
-    def get_show_dialog():
-        return {
-            'show_dialog': 'True'
-        }
