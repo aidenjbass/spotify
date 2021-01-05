@@ -2,7 +2,9 @@ import webview
 
 
 def js_logic(window):
-    window.evaluate_js('alert("uh oh this works")')
+    window.evaluate_js(
+        'alert("uh oh this works")'
+    )
 
 
 window = webview.create_window(
