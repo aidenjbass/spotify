@@ -36,9 +36,10 @@ valid_request = r1.status_code in range(200, 299)  # simple check to to see if r
 print(valid_request)  # printing variables throughout program to check for errors
 
 token_response_data = r1.json()
+
 now = datetime.datetime.now()
 expires_in = token_response_data['expires_in']  # in seconds
-expires_at = now + datetime.timedelta(seconds=expires_in)
+expires_at = now + datetime.timedelta(seconds=expires_in)  # calculates time at which token expires
 
 print(expires_at)  # printing variable throughout program to check for errors
 
