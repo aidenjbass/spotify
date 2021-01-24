@@ -1,5 +1,6 @@
 import datetime
 import base64
+import requests
 
 
 class ClientAuth(object):  # this class is just for the Client authentication part of the Spotify API
