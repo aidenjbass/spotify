@@ -49,7 +49,7 @@ header = {
     'Authorization': f'Bearer {token}'
 }
 endpoint = 'https://api.spotify.com/v1/search'
-search_query = urlencode({'q': 'betty', "type": "track"})
+search_query = urlencode({'q': 'betty', "type": "track", 'limit': '1'})
 print(search_query)
 
 lookup_url = f'{endpoint}?{search_query}'
