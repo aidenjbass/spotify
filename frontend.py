@@ -38,8 +38,8 @@ button_album = tk.Button(base,
                          text='Select Album',
                          command=lambda: get_search_field_from_frontend(button_input='album'))
 button_artist = tk.Button(base,
-                         text='Select Artist',
-                         command=lambda: get_search_field_from_frontend(button_input='artist'))
+                          text='Select Artist',
+                          command=lambda: get_search_field_from_frontend(button_input='artist'))
 button_track = tk.Button(base,
                          text='Select Track',
                          command=lambda: get_search_field_from_frontend(button_input='track'))
