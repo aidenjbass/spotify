@@ -2,7 +2,6 @@ import tkinter as tk
 
 
 def get_search_field_from_frontend(button_input):
-    # test function to interact tkinter with backend script Spotify.py
     if button_input == 'album':
         search_field = button_input
         print(search_field)
@@ -35,12 +34,16 @@ posy = int(base.winfo_screenheight() / 2 - wHeight / 2)
 base.geometry('+{}+{}'.format(posx, posy))
 
 # start of widgets
-button_album = tk.Button(base, text='Select Album',
+button_album = tk.Button(base,
+                         text='Select Album',
                          command=lambda: get_search_field_from_frontend(button_input='album'))
-button_artist = tk.Button(base, text='Select Artist',
-                          command=lambda: get_search_field_from_frontend(button_input='artist'))
-button_track = tk.Button(base, text='Select Track',
+button_artist = tk.Button(base,
+                         text='Select Artist',
+                         command=lambda: get_search_field_from_frontend(button_input='artist'))
+button_track = tk.Button(base,
+                         text='Select Track',
                          command=lambda: get_search_field_from_frontend(button_input='track'))
+
 button_album.pack()
 button_artist.pack()
 button_track.pack()
