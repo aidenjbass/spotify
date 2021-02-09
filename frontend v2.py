@@ -2,7 +2,7 @@ import tkinter as tk
 import webview
 
 
-def web_test():
+def web_launch():
     webview.create_window(
         title='Spotify Authentication',
         url='http://google.com',
@@ -14,7 +14,7 @@ def web_test():
 base = tk.Tk()  # root window
 
 '''
-Centers code on any display
+Centers window on any display
 '''
 window_width = base.winfo_reqwidth()  # gets width of tk window
 window_height = base.winfo_reqheight()  # gets height of tk window
@@ -40,23 +40,32 @@ choice = tk.StringVar(base)
 
 # dictionary of options
 choices = ['Artist', 'Album', 'Track']
-choice.set('Artist')  # set the default option
+choice.set('Option')  # set the default option
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
 
-tk.Label(base, text="Choose An Option").place(relx=0.4, rely=0.2, anchor='center')
-popupMenu.place(relx=0.7, rely=0.2, anchor='center')
+tk.Label(base, text="Choose an option from the list below").place(relx=0.5, rely=0.2, anchor='center')
+popupMenu.place(relx=0.5, rely=0.3, anchor='center')
 
 
 # on change dropdown value
-def change_dropdown(*args):
+def change_dropdown_search_type(*args):
     print(choice.get().lower())
     return choice.get().lower()
 
 
 # link function to change dropdown
-choice.trace('w', change_dropdown)
+choice.trace('w', change_dropdown_search_type)
 
-tk.Button(base, text='Login to your account', command=lambda: web_test()).place(relx=0.5, rely=0.4, anchor='center')
+# 'CHOICE' below needs to change when dropdown menu is changed
+search_field_label = tk.Label(base, text=f'What CHOICE would you like to search for?')
+search_field_label.place(relx=0.5, rely=0.5, anchor='center')
+
+search_field = tk.Entry(base)
+search_field.place(relx=0.5, rely=0.6, anchor='center')
+
+login = tk.Button(base, text='Optionally, login to your account', command=lambda: web_launch())
+login.place(relx=0.5, rely=0.8, anchor='center')
+
 
 base.mainloop()
