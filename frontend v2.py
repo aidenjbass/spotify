@@ -1,12 +1,13 @@
+# external module imports
 import tkinter as tk
 import webview
 
 
-def web_launch():
+def web_launch():  # using the pywebiew module I am able to launch a lightweight chromium-based browser within python
     webview.create_window(
         title='Spotify Authentication',
         url='http://google.com',
-        confirm_close=False
+        confirm_close=True
     )
     webview.start()
 

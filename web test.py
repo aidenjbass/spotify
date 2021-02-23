@@ -1,20 +1,20 @@
 import webview
 
 
-def js_logic(window):
-    window.evaluate_js(
+def js_logic(main):
+    main.evaluate_js(
         'alert("uh oh this works")'
     )
 
 
-window = webview.create_window(
+main = webview.create_window(
     title='Spotify Authentication',
     html='<h1>test</h1>',
-    confirm_close=False
+    confirm_close=True
 )
 
 webview.start(
     js_logic,
-    window,
+    main,
     http_server=True
 )
