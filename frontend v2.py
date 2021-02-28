@@ -52,6 +52,7 @@ popupMenu.place(relx=0.5, rely=0.3, anchor='center')
 
 
 # on change dropdown value
+# noinspection PyUnusedLocal
 def change_dropdown(*args):
     global dropdown
     dropdown = str(choice.get().lower())
