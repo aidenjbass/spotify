@@ -56,6 +56,7 @@ def change_dropdown(*args):
     global dropdown
     dropdown = str(choice.get().lower())
     print(dropdown)
+    search_field_label['text'] = f"What {dropdown} would you like to search for?"
     return dropdown
 
 
@@ -63,13 +64,13 @@ def change_dropdown(*args):
 choice.trace('w', change_dropdown)
 
 # 'CHOICE' below needs to change when dropdown menu is changed
-search_field_label = tk.Label(base, text=f'What{dropdown}would you like to search for?')
+search_field_label = tk.Label(base, text="What would you like to search for?")
 search_field_label.place(relx=0.5, rely=0.5, anchor='center')
 
 search_field = tk.Entry(base)
 search_field.place(relx=0.5, rely=0.6, anchor='center')
 
-login = tk.Button(base, text='Optionally, login to your account', command=lambda: web_launch())
+login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
 login.place(relx=0.5, rely=0.8, anchor='center')
 
 base.mainloop()
