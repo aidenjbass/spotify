@@ -110,17 +110,15 @@ class SearchEngine(object):
     search_type_query = None
 
     @staticmethod
-    def form_search_query(self, endpoint, search_field_query, search_type_query):
+    def make_search_query(search_field_query, search_type_query):
         # parses search_query with option category and chosen search from option category
         search_query = urlencode({'q': f'{search_field_query}',
                                   'type': f'{search_type_query}',
                                   'limit': '1'})
-        lookup_url = f'{endpoint}?{search_query}'
-
-    @staticmethod
-    def search_query_request(self, lookup_url, header):
-        r2 = requests.get(lookup_url, headers=header)  # interacts with Spotify API and retrieves the top search query
-        return r2
+        lookup_url = f'{SearchEngine.get_search_endpoint()}?{search_query}'
+        # interacts with Spotify API and retrieves the top search query
+        r2 = requests.get(lookup_url, headers=SearchEngine.form_header())
+        return r2.json()
 
 
 '''
@@ -130,7 +128,7 @@ class SearchEngine(object):
 base = tk.Tk()  # root window
 
 
-def web_launch():  # using the pywebiew module I am able to launch a lightweight chromium-based browser within python
+def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
     webview.create_window(
         title='Spotify Authentication',
         url='http://google.com',
@@ -166,7 +164,9 @@ choice.set('Option')  # set the default option
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
 
-tk.Label(base, text="Choose an option from the list below").place(relx=0.5, rely=0.2, anchor='center')
+popupMenu_label = tk.Label(base, text="Choose an option from the list below")
+
+popupMenu_label.place(relx=0.5, rely=0.2, anchor='center')
 popupMenu.place(relx=0.5, rely=0.3, anchor='center')
 
 
@@ -205,11 +205,15 @@ search_field = None
 
 def send_GUI_query_to_backend():
     global dropdown_option, search_field
-    get_search_field_entry()
     dropdown_option = get_change_dropdown()
     search_field = get_search_field_entry()
     print(dropdown_option, search_field)
     return dropdown_option, search_field
 
 
+# def invoke_search_from_frontend():
+#     SearchEngine.search_query_request()
+
 base.mainloop()
+
+print(SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option))
