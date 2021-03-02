@@ -163,4 +163,3 @@ class SearchEngine(object):
 
     # print(r2.status_code)
     print(r2.json())
-

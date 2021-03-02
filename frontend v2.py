@@ -2,14 +2,12 @@
 import tkinter as tk
 import webview
 
-dropdown = ' '
-
 
 def web_launch():  # using the pywebiew module I am able to launch a lightweight chromium-based browser within python
     webview.create_window(
         title='Spotify Authentication',
         url='http://google.com',
-        confirm_close=True
+        confirm_close=False
     )
     webview.start()
 
@@ -38,8 +36,11 @@ End
 '''
 Beginning of widgets
 '''
-# variable
+# variable setting
 choice = tk.StringVar(base)
+dropdown_option_GUI = None
+search_field_GUI = None
+
 
 # dictionary of options
 choices = ['Artist', 'Album', 'Track']
@@ -54,24 +55,41 @@ popupMenu.place(relx=0.5, rely=0.3, anchor='center')
 # on change dropdown value
 # noinspection PyUnusedLocal
 def change_dropdown(*args):
-    global dropdown
-    dropdown = str(choice.get().lower())
-    print(dropdown)
-    search_field_label['text'] = f"What {dropdown} would you like to search for?"
-    return dropdown
+    global dropdown_option_GUI
+    dropdown_option_GUI = str(choice.get().lower())
+    search_field_label['text'] = f"What {dropdown_option_GUI} would you like to search for?"
+    return dropdown_option_GUI
 
 
 # link function to change dropdown
 choice.trace('w', change_dropdown)
 
-# 'CHOICE' below needs to change when dropdown menu is changed
 search_field_label = tk.Label(base, text="What would you like to search for?")
-search_field_label.place(relx=0.5, rely=0.5, anchor='center')
+search_field_label.place(relx=0.5, rely=0.4, anchor='center')
 
-search_field = tk.Entry(base)
-search_field.place(relx=0.5, rely=0.6, anchor='center')
+search_field_entry = tk.Entry(base)
+search_field_entry.place(relx=0.5, rely=0.5, anchor='center')
+
+
+def get_search_field_entry():
+    global search_field_GUI
+    search_field_GUI = str(search_field_entry.get())
+    return search_field_GUI
+
 
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
-login.place(relx=0.5, rely=0.8, anchor='center')
+login.place(relx=0.5, rely=0.7, anchor='center')
+
+
+def send_GUI_query_to_backend():
+    get_search_field_entry()
+    dropdown_option = dropdown_option_GUI
+    search_field = search_field_GUI
+    print(dropdown_option, search_field)
+    return dropdown_option, search_field
+
+
+execute = tk.Button(base, text="When ready to search, click me", command=lambda: send_GUI_query_to_backend())
+execute.place(relx=0.5, rely=0.9, anchor='center')
 
 base.mainloop()
