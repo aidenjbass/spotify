@@ -213,6 +213,7 @@ def send_GUI_query_to_backend():
 
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
+    # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
     result = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
     print(result)
 
