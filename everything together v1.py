@@ -98,7 +98,6 @@ class SearchEngine(object):
         header = {
             'Authorization': f'Bearer {token}'
         }
-        print(header)
         return header
 
     @staticmethod
@@ -147,6 +146,7 @@ def center_tkinter_window():  # Centers window on any display
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=500, width=500)  # gives minimum size in px
     base.resizable(False, False)  # disables ability to resize window
+    base.wm_attributes('-topmost', 1)  # always on top
 
 
 center_tkinter_window()
@@ -190,7 +190,7 @@ search_field_entry.place(relx=0.5, rely=0.5, anchor='center')
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
 login.place(relx=0.5, rely=0.7, anchor='center')
 
-execute = tk.Button(base, text="When ready to search, click me", command=lambda: send_GUI_query_to_backend())
+execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_search_from_frontend())
 execute.place(relx=0.5, rely=0.9, anchor='center')
 
 
@@ -211,9 +211,10 @@ def send_GUI_query_to_backend():
     return dropdown_option, search_field
 
 
-# def invoke_search_from_frontend():
-#     SearchEngine.search_query_request()
+def invoke_search_from_frontend():
+    send_GUI_query_to_backend()
+    result = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
+    print(result)
+
 
 base.mainloop()
-
-print(SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option))
