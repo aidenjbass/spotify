@@ -14,7 +14,7 @@ cid = secrets.spotify_cid
 secret = secrets.spotify_csecret
 
 
-class ClientAuth(object):  # this class is just for the Client authentication part of the Spotify API
+class ClientAuth(object):  # this class is just for the client authentication
     # constant setting
     token = None
     token_expires_at = datetime.datetime.now()
