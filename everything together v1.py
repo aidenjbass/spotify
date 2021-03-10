@@ -19,7 +19,7 @@ class ClientAuth(object):  # this class is just for the client authentication
     token = None
     token_expires_at = datetime.datetime.now()
     token_has_expired = True
-    token_url = "https://accounts.spotify.com/api/token"
+    token_url = 'https://accounts.spotify.com/api/token'
 
     # client_id and and client_secret are now constants stored in the external file secrets.py
     client_id = None
@@ -34,7 +34,7 @@ class ClientAuth(object):  # this class is just for the client authentication
         client_id = self.client_id
         client_secret = self.client_secret
         if client_id is None or client_secret is None:
-            raise Exception('client_id or client_secret not set')
+            raise Exception("client_id or client_secret not set")
         else:  # encodes the credentials in base64 encoding rather than UTF, which is required by the API
             client_credentials = f'{client_id}:{client_secret}'
             client_credentials_base64 = base64.b64encode(client_credentials.encode())
@@ -63,7 +63,7 @@ class ClientAuth(object):  # this class is just for the client authentication
                            headers=token_headers)
         valid_request = r1.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
-            raise Exception('Authentication failed')
+            raise Exception("Authentication failed")
         else:
             response_data = r1.json()
             now = datetime.datetime.now()
@@ -94,9 +94,9 @@ class SearchEngine(object):
 
     @staticmethod
     def form_header():
-        token = SearchEngine.InvokeAuthFromClient.get_access_token()
+        token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
         header = {
-            'Authorization': f'Bearer {token}'
+            'Authorization': f'Bearer {token_from_client_auth}'
         }
         return header
 
@@ -129,7 +129,7 @@ base = tk.Tk()  # root window
 
 def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
     webview.create_window(
-        title='Spotify Authentication',
+        title="Spotify Authentication",
         url='http://google.com',
         confirm_close=False
     )
