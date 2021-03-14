@@ -246,10 +246,9 @@ def list_artist_top_10_GUI(response_data):
 
 
 def list_album_tracklist(response_data):
-    for i in range(10):
+    for i in range(len(response_data['items'])):
         tracklist = response_data['items'][i]['name']
-        print(tracklist)
-        print(len(response_data['items']))
+        print(f'{i+1} {tracklist}')
 
 
 def invoke_search_from_frontend():
