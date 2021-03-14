@@ -120,12 +120,11 @@ class SearchEngine(object):
     @staticmethod
     def form_header_results():
         token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
-        header = {
+        return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
             'Authorization': f'Bearer {token_from_client_auth}'
         }
-        return header
 
     @staticmethod
     def get_artist_top_tracks(response_search_query):
