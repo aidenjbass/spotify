@@ -151,6 +151,27 @@ class SearchEngine(object):
         return album_listing_request
 
 
+class TrackInfo(object):
+
+    @staticmethod
+    def get_artist_top_track_ids(response_data):
+        form_top_ids = ''
+        for i in range(10):
+            top_ids = response_data['tracks'][i]['id']
+            form_top_ids += str(top_ids + '&')
+
+        print(form_top_ids)
+
+    @staticmethod
+    def get_album_tracklist_ids(response_data):
+        form_tracklist_id = ''
+        for i in range(len(response_data['items'])):
+            tracklist_ids = response_data['items'][i]['id']
+            form_tracklist_id += str(tracklist_ids + '%')
+
+        print(form_tracklist_id)
+
+
 '''
 *** FRONTEND STARTS HERE ***
 '''
@@ -259,10 +280,12 @@ def invoke_search_from_frontend():
         response = SearchEngine.get_artist_top_tracks(response_search_query=search_1)
         response_data = response.json()
         list_artist_top_10_GUI(response_data)
+        TrackInfo.get_artist_top_track_ids(response_data)
     elif dropdown_option == 'album':
         response = SearchEngine.get_album_tracklist(response_search_query=search_1)
         response_data = response.json()
         list_album_tracklist(response_data)
+        TrackInfo.get_album_tracklist_ids(response_data)
     elif dropdown_option == 'track':
         pass
     else:
