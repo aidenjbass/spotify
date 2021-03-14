@@ -1,10 +1,9 @@
 # external imports
+from urllib.parse import urlencode
 import base64
 import datetime
-import requests
-from urllib.parse import urlencode
-# external imports for GUI
 import tkinter as tk
+import requests
 import webview
 
 # project imports
@@ -116,18 +115,40 @@ class SearchEngine(object):
                                   'limit': '1'})
         lookup_url = f'{SearchEngine.get_search_endpoint()}?{search_query}'
         # interacts with Spotify API and retrieves the top search query
-        json_response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
-        return json_response_search_query
+        response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
+        return response_search_query
 
     @staticmethod
-    def get_artist_top_tracks(json_response_search_query):
-        response_data_search = json_response_search_query.json()
-        artist_id = response_data_search['id']
-        print(artist_id)
+    def form_header_results():
+        token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
+        header = {
+            'Accept': 'application/json',
+            'Content_Type': 'application/json',
+            'Authorization': f'Bearer {token_from_client_auth}'
+        }
+        return header
+
+    @staticmethod
+    def get_artist_top_tracks(response_search_query):
+        response_artist_search = response_search_query.json()
+        artist_id = response_artist_search['artists']['items'][0]['id']
         # GET https://api.spotify.com/v1/artists/{id}/top-tracks
-        artist_top_tracks_url = 'http://api.spotfy.com/v1/artists/'
-        artist_top_tracks_query = urlencode(artist_top_tracks_url, artist_id, 'top-tracks')
-        print(artist_top_tracks_query)
+        endpoint = 'https://api.spotify.com/v1/artists'
+        market = urlencode({'market': 'US'})
+        artist_top_tracks_url = f'{endpoint}/{artist_id}/top-tracks?{market}'
+        artist_top_tracks_request = requests.get(artist_top_tracks_url, headers=SearchEngine.form_header_results())
+        return artist_top_tracks_request
+
+    @staticmethod
+    def get_album_tracklist(response_search_query):
+        response_album_search = response_search_query.json()
+        album_id = response_album_search['albums']['items'][0]['id']
+        # GET https://api.spotify.com/v1/albums/{id}/tracks
+        endpoint = 'https://api.spotify.com/v1/albums'
+        market = urlencode({'market': 'US'})
+        album_listing_url = f'{endpoint}/{album_id}/tracks?{market}'
+        album_listing_request = requests.get(album_listing_url, headers=SearchEngine.form_header_results())
+        return album_listing_request
 
 
 '''
@@ -202,29 +223,51 @@ login.place(relx=0.5, rely=0.7, anchor='center')
 execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_search_from_frontend())
 execute.place(relx=0.5, rely=0.9, anchor='center')
 
+dropdown_option = None
+search_field = None
+
 
 def get_search_field_entry():
     search_field_GUI = str(search_field_entry.get())
     return search_field_GUI
 
 
-dropdown_option = None
-search_field = None
-
-
 def send_GUI_query_to_backend():
     global dropdown_option, search_field
     dropdown_option = get_change_dropdown()
     search_field = get_search_field_entry()
-    print(dropdown_option, search_field)
     return dropdown_option, search_field
+
+
+def list_artist_top_10_GUI(response_data):
+    for i in range(10):
+        top = response_data['tracks'][i]['name']
+        print(f'{i+1} {top}')
+
+
+def list_album_tracklist(response_data):
+    for i in range(10):
+        tracklist = response_data['items'][i]['name']
+        print(tracklist)
+        print(len(response_data['items']))
 
 
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
     search_1 = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
-    print(search_1.json())
+    if dropdown_option == 'artist':
+        response = SearchEngine.get_artist_top_tracks(response_search_query=search_1)
+        response_data = response.json()
+        list_artist_top_10_GUI(response_data)
+    elif dropdown_option == 'album':
+        response = SearchEngine.get_album_tracklist(response_search_query=search_1)
+        response_data = response.json()
+        list_album_tracklist(response_data)
+    elif dropdown_option == 'track':
+        pass
+    else:
+        pass
 
 
 base.mainloop()
