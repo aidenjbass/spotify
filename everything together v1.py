@@ -89,6 +89,9 @@ class ClientAuth(object):  # this class is just for the client authentication
 
 
 class SearchEngine(object):
+    def __init__(self):
+        pass
+
     InvokeAuthFromClient = ClientAuth(cid, secret)
 
     @staticmethod
@@ -107,13 +110,12 @@ class SearchEngine(object):
     search_field_query = None
     search_type_query = None
 
-    @staticmethod
-    def make_search_query(search_field_query, search_type_query):
+    def make_search_query(self, search_field_query, search_type_query):
         # parses search_query with option category and chosen search from option category
         search_query = urlencode({'q': f'{search_field_query}',
                                   'type': f'{search_type_query}',
                                   'limit': '1'})
-        lookup_url = f'{SearchEngine.get_search_endpoint()}?{search_query}'
+        lookup_url = f'{self.get_search_endpoint()}?{search_query}'
         # interacts with Spotify API and retrieves the top search query
         response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
         return response_search_query
@@ -262,26 +264,27 @@ def send_GUI_query_to_backend():
 def list_artist_top_10_GUI(response_data):
     for i in range(10):
         top = response_data['tracks'][i]['name']
-        print(f'{i+1} {top}')
+        print(f'{i + 1} {top}')
 
 
 def list_album_tracklist(response_data):
     for i in range(len(response_data['items'])):
         tracklist = response_data['items'][i]['name']
-        print(f'{i+1} {tracklist}')
+        print(f'{i + 1} {tracklist}')
 
 
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
-    search_1 = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
+    search_1 = SearchEngine()
+    search_2 = search_1.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
     if dropdown_option == 'artist':
-        response = SearchEngine.get_artist_top_tracks(response_search_query=search_1)
+        response = SearchEngine.get_artist_top_tracks(response_search_query=search_2)
         response_data = response.json()
         list_artist_top_10_GUI(response_data)
         TrackInfo.get_artist_top_track_ids(response_data)
     elif dropdown_option == 'album':
-        response = SearchEngine.get_album_tracklist(response_search_query=search_1)
+        response = SearchEngine.get_album_tracklist(response_search_query=search_2)
         response_data = response.json()
         list_album_tracklist(response_data)
         TrackInfo.get_album_tracklist_ids(response_data)
