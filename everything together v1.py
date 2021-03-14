@@ -103,8 +103,8 @@ class SearchEngine(object):
 
     @staticmethod
     def get_search_endpoint():
-        endpoint_search = 'https://api.spotify.com/v1/search'  # API endpoint to search API
-        return endpoint_search
+        endpoint = 'https://api.spotify.com/v1/search'  # API endpoint to search API
+        return endpoint
 
     search_field_query = None
     search_type_query = None
