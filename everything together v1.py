@@ -103,8 +103,7 @@ class SearchEngine(object):
 
     @staticmethod
     def get_search_endpoint():
-        # API endpoint to search API
-        endpoint_search = 'https://api.spotify.com/v1/search'
+        endpoint_search = 'https://api.spotify.com/v1/search'  # API endpoint to search API
         return endpoint_search
 
     search_field_query = None
@@ -120,35 +119,32 @@ class SearchEngine(object):
         response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
         return response_search_query
 
-    @staticmethod
-    def form_header_results():
-        token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
+    def form_header_results(self):  # shouldn't be static
+        token_from_client_auth = self.InvokeAuthFromClient.get_access_token()
         return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
             'Authorization': f'Bearer {token_from_client_auth}'
         }
 
-    @staticmethod
-    def get_artist_top_tracks(response_search_query):
+    def get_artist_top_tracks(self, response_search_query):
         response_artist_search = response_search_query.json()
         artist_id = response_artist_search['artists']['items'][0]['id']
         # GET https://api.spotify.com/v1/artists/{id}/top-tracks
         endpoint = 'https://api.spotify.com/v1/artists'
         market = urlencode({'market': 'US'})
         artist_top_tracks_url = f'{endpoint}/{artist_id}/top-tracks?{market}'
-        artist_top_tracks_request = requests.get(artist_top_tracks_url, headers=SearchEngine.form_header_results())
+        artist_top_tracks_request = requests.get(artist_top_tracks_url, headers=self.form_header_results())
         return artist_top_tracks_request
 
-    @staticmethod
-    def get_album_tracklist(response_search_query):
+    def get_album_tracklist(self, response_search_query):
         response_album_search = response_search_query.json()
         album_id = response_album_search['albums']['items'][0]['id']
         # GET https://api.spotify.com/v1/albums/{id}/tracks
         endpoint = 'https://api.spotify.com/v1/albums'
         market = urlencode({'market': 'US'})
         album_listing_url = f'{endpoint}/{album_id}/tracks?{market}'
-        album_listing_request = requests.get(album_listing_url, headers=SearchEngine.form_header_results())
+        album_listing_request = requests.get(album_listing_url, headers=self.form_header_results())
         return album_listing_request
 
 
@@ -278,13 +274,14 @@ def invoke_search_from_frontend():
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
     search_1 = SearchEngine()
     search_2 = search_1.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
+    SearchEngine_invoke = SearchEngine()
     if dropdown_option == 'artist':
-        response = SearchEngine.get_artist_top_tracks(response_search_query=search_2)
+        response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
         response_data = response.json()
         list_artist_top_10_GUI(response_data)
         TrackInfo.get_artist_top_track_ids(response_data)
     elif dropdown_option == 'album':
-        response = SearchEngine.get_album_tracklist(response_search_query=search_2)
+        response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
         response_data = response.json()
         list_album_tracklist(response_data)
         TrackInfo.get_album_tracklist_ids(response_data)
