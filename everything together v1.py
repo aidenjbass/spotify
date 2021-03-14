@@ -94,10 +94,9 @@ class SearchEngine(object):
     @staticmethod
     def form_header():
         token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
-        header = {
+        return {
             'Authorization': f'Bearer {token_from_client_auth}'
         }
-        return header
 
     @staticmethod
     def get_search_endpoint():
