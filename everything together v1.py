@@ -58,14 +58,14 @@ class ClientAuth(object):  # this class is just for the client authentication
         token_data = self.get_token_data()
         token_headers = self.get_token_header()
         # calls API to retrieve the client token used throughout the program later on to interact with API
-        r1 = requests.post(access_token_url,
-                           data=token_data,
-                           headers=token_headers)
-        valid_request = r1.status_code in range(200, 299)  # anything outside this range is invalid
+        json_response_token = requests.post(access_token_url,
+                                            data=token_data,
+                                            headers=token_headers)
+        valid_request = json_response_token.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
             raise Exception("Authentication failed")
         else:
-            response_data = r1.json()
+            response_data = json_response_token.json()
             now = datetime.datetime.now()
             token = response_data['access_token']
             expires_in = response_data['expires_in']  # in seconds, will typically give a value of 3600 seconds
@@ -116,8 +116,18 @@ class SearchEngine(object):
                                   'limit': '1'})
         lookup_url = f'{SearchEngine.get_search_endpoint()}?{search_query}'
         # interacts with Spotify API and retrieves the top search query
-        r2 = requests.get(lookup_url, headers=SearchEngine.form_header())
-        return r2.json()
+        json_response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
+        return json_response_search_query
+
+    @staticmethod
+    def get_artist_top_tracks(json_response_search_query):
+        response_data_search = json_response_search_query.json()
+        artist_id = response_data_search['id']
+        print(artist_id)
+        # GET https://api.spotify.com/v1/artists/{id}/top-tracks
+        artist_top_tracks_url = 'http://api.spotfy.com/v1/artists/'
+        artist_top_tracks_query = urlencode(artist_top_tracks_url, artist_id, 'top-tracks')
+        print(artist_top_tracks_query)
 
 
 '''
@@ -150,7 +160,6 @@ def center_tkinter_window():  # Centers window on any display
 
 
 center_tkinter_window()
-
 
 '''
 Beginning of widgets
@@ -214,8 +223,8 @@ def send_GUI_query_to_backend():
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
-    result = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
-    print(result)
+    search_1 = SearchEngine.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
+    print(search_1.json())
 
 
 base.mainloop()
