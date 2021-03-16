@@ -14,6 +14,7 @@ secret = secrets.spotify_csecret
 
 
 class ClientAuth(object):  # this class is just for the client authentication
+
     # constant setting
     token = None
     token_expires_at = datetime.datetime.now()
@@ -57,9 +58,11 @@ class ClientAuth(object):  # this class is just for the client authentication
         token_data = self.get_token_data()
         token_headers = self.get_token_header()
         # calls API to retrieve the client token used throughout the program later on to interact with API
-        json_response_token = requests.post(access_token_url,
-                                            data=token_data,
-                                            headers=token_headers)
+        json_response_token = requests.post(
+            access_token_url,
+            data=token_data,
+            headers=token_headers
+        )
         valid_request = json_response_token.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
             raise Exception("Authentication failed")
@@ -89,10 +92,10 @@ class ClientAuth(object):  # this class is just for the client authentication
 
 
 class SearchEngine(object):
+    InvokeAuthFromClient = ClientAuth(cid, secret)
+
     def __init__(self):
         pass
-
-    InvokeAuthFromClient = ClientAuth(cid, secret)
 
     @staticmethod
     def list_artist_top_10_GUI(response_data):
@@ -105,6 +108,11 @@ class SearchEngine(object):
         for i in range(len(response_data['items'])):
             tracklist = response_data['items'][i]['name']
             print(f'{i + 1} {tracklist}')
+
+    @staticmethod
+    def list_track(response_data):
+        track = response_data['tracks']['items'][0]['name']
+        print(track)
 
     def get_search_header(self):
         return {
@@ -121,12 +129,17 @@ class SearchEngine(object):
 
     def make_search_query(self, search_field_query, search_type_query):
         # parses search_query with option category and chosen search from option category
-        search_query = urlencode({'q': f'{search_field_query}',
-                                  'type': f'{search_type_query}',
-                                  'limit': '1'})
+        search_query = urlencode({
+            'q': f'{search_field_query}',
+            'type': f'{search_type_query}',
+            'limit': '1'
+        })
         lookup_url = f'{self.get_search_endpoint()}?{search_query}'
         # interacts with Spotify API and retrieves the top search query
-        response_search_query = requests.get(lookup_url, headers=self.get_search_header())
+        response_search_query = requests.get(
+            lookup_url,
+            headers=self.get_search_header()
+        )
         return response_search_query
 
     def form_header_results(self):  # shouldn't be static
@@ -141,9 +154,14 @@ class SearchEngine(object):
         artist_id = response_artist_search['artists']['items'][0]['id']
         # GET https://api.spotify.com/v1/artists/{id}/top-tracks
         endpoint = 'https://api.spotify.com/v1/artists'
-        market = urlencode({'market': 'US'})
+        market = urlencode({
+            'market': 'US'
+        })
         artist_top_tracks_url = f'{endpoint}/{artist_id}/top-tracks?{market}'
-        artist_top_tracks_request = requests.get(artist_top_tracks_url, headers=self.form_header_results())
+        artist_top_tracks_request = requests.get(
+            artist_top_tracks_url,
+            headers=self.form_header_results()
+        )
         return artist_top_tracks_request
 
     def get_album_tracklist(self, response_search_query):
@@ -151,34 +169,77 @@ class SearchEngine(object):
         album_id = response_album_search['albums']['items'][0]['id']
         # GET https://api.spotify.com/v1/albums/{id}/tracks
         endpoint = 'https://api.spotify.com/v1/albums'
-        market = urlencode({'market': 'US'})
+        market = urlencode({
+            'market': 'US'
+        })
         album_listing_url = f'{endpoint}/{album_id}/tracks?{market}'
-        album_listing_request = requests.get(album_listing_url, headers=self.form_header_results())
+        album_listing_request = requests.get(
+            album_listing_url,
+            headers=self.form_header_results()
+        )
         return album_listing_request
 
 
 class TrackInfo(object):
+    InvokeAuthFromClient = ClientAuth(cid, secret)
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def get_artist_top_track_ids(response_data):
         form_top_ids = ''
         for i in range(10):
             top_ids = response_data['tracks'][i]['id']
-            form_top_ids += str(top_ids + '&')
+            form_top_ids += str(top_ids + ',')
 
-        print(form_top_ids)
+        # print(form_top_ids)
+        return form_top_ids
 
     @staticmethod
     def get_album_tracklist_ids(response_data):
         form_tracklist_id = ''
         for i in range(len(response_data['items'])):
             tracklist_ids = response_data['items'][i]['id']
-            form_tracklist_id += str(tracklist_ids + '%')
+            form_tracklist_id += str(tracklist_ids + ',')
 
-        print(form_tracklist_id)
+        # print(form_tracklist_id)
+        return form_tracklist_id
 
-    def get_track_ids(self):
-        pass
+    @staticmethod
+    def get_track_ids(response_data):
+        track_id = response_data['tracks']['items'][0]['id']
+        print(track_id)
+        return track_id
+
+    def form_header(self):
+        return {
+            'Accept': 'application/json',
+            'Content_Type': 'application/json',
+            'Authorization': f'Bearer {self.InvokeAuthFromClient.get_access_token()}'
+        }
+
+    def get_track_info(self, response_data):
+        track_ids = ''
+        # GET https://api.spotify.com/v1/audio-features
+        if dropdown_option == 'artist':
+            track_ids = self.get_artist_top_track_ids(response_data)
+            print(track_ids)
+        elif dropdown_option == 'album':
+            track_ids = self.get_album_tracklist_ids(response_data)
+            print(track_ids)
+        elif dropdown_option == 'track':
+            pass
+        else:
+            pass
+        endpoint = 'https://api.spotify.com/v1/audio-features?'
+        track_info_url = f'{endpoint}ids={track_ids}'
+        print(track_info_url)
+        track_info_request = requests.get(
+            track_info_url,
+            headers=self.form_header()
+        )
+        print(track_info_request.json())
 
 
 '''
@@ -271,17 +332,20 @@ def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
     SearchEngine_invoke = SearchEngine()
+    TrackInfo_invoke = TrackInfo()
     search_2 = SearchEngine_invoke.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
     if dropdown_option == 'artist':
         response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
         response_data = response.json()
         SearchEngine_invoke.list_artist_top_10_GUI(response_data)
-        TrackInfo.get_artist_top_track_ids(response_data)
+        TrackInfo_invoke.get_artist_top_track_ids(response_data)
+        TrackInfo_invoke.get_track_info(response_data)
     elif dropdown_option == 'album':
         response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
         response_data = response.json()
         SearchEngine_invoke.list_album_tracklist(response_data)
-        TrackInfo.get_album_tracklist_ids(response_data)
+        TrackInfo_invoke.get_album_tracklist_ids(response_data)
+        TrackInfo_invoke.get_track_info(response_data)
     elif dropdown_option == 'track':
         pass
     else:
