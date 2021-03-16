@@ -177,21 +177,15 @@ class TrackInfo(object):
 
         print(form_tracklist_id)
 
+    def get_track_ids(self):
+        pass
+
 
 '''
 *** FRONTEND STARTS HERE ***
 '''
 
 base = tk.Tk()  # root window
-
-
-def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
-    webview.create_window(
-        title="Spotify Authentication",
-        url='http://google.com',
-        confirm_close=False
-    )
-    webview.start()
 
 
 def center_tkinter_window():  # Centers window on any display
@@ -219,13 +213,6 @@ choice = tk.StringVar(base)
 choices = ['Artist', 'Album', 'Track']
 choice.set('Option')  # set the default option
 
-popupMenu = tk.OptionMenu(base, choice, *choices)
-
-popupMenu_label = tk.Label(base, text="Choose an option from the list below")
-
-popupMenu_label.place(relx=0.5, rely=0.2, anchor='center')
-popupMenu.place(relx=0.5, rely=0.3, anchor='center')
-
 
 # on change dropdown value
 # noinspection PyUnusedLocal
@@ -235,8 +222,13 @@ def get_change_dropdown(*args):
     return dropdown_option_GUI
 
 
-# link function to change dropdown
-choice.trace('w', get_change_dropdown)
+choice.trace('w', get_change_dropdown)  # link function to change dropdown
+
+popupMenu_label = tk.Label(base, text="Choose an option from the list below")
+popupMenu_label.place(relx=0.5, rely=0.2, anchor='center')
+
+popupMenu = tk.OptionMenu(base, choice, *choices)
+popupMenu.place(relx=0.5, rely=0.3, anchor='center')
 
 search_field_label = tk.Label(base, text="What would you like to search for?")
 search_field_label.place(relx=0.5, rely=0.4, anchor='center')
@@ -252,6 +244,15 @@ execute.place(relx=0.5, rely=0.9, anchor='center')
 
 dropdown_option = None
 search_field = None
+
+
+def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
+    webview.create_window(
+        title="Spotify Authentication",
+        url='http://google.com',
+        confirm_close=False
+    )
+    webview.start()
 
 
 def get_search_field_entry():
