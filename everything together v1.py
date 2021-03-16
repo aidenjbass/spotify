@@ -272,9 +272,8 @@ def list_album_tracklist(response_data):
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
-    search_1 = SearchEngine()
-    search_2 = search_1.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
     SearchEngine_invoke = SearchEngine()
+    search_2 = SearchEngine_invoke.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
     if dropdown_option == 'artist':
         response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
         response_data = response.json()
