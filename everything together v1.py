@@ -95,10 +95,20 @@ class SearchEngine(object):
     InvokeAuthFromClient = ClientAuth(cid, secret)
 
     @staticmethod
-    def form_header():
-        token_from_client_auth = SearchEngine.InvokeAuthFromClient.get_access_token()
+    def list_artist_top_10_GUI(response_data):
+        for i in range(10):
+            top = response_data['tracks'][i]['name']
+            print(f'{i + 1} {top}')
+
+    @staticmethod
+    def list_album_tracklist(response_data):
+        for i in range(len(response_data['items'])):
+            tracklist = response_data['items'][i]['name']
+            print(f'{i + 1} {tracklist}')
+
+    def get_search_header(self):
         return {
-            'Authorization': f'Bearer {token_from_client_auth}'
+            'Authorization': f'Bearer {self.InvokeAuthFromClient.get_access_token()}'
         }
 
     @staticmethod
@@ -116,15 +126,14 @@ class SearchEngine(object):
                                   'limit': '1'})
         lookup_url = f'{self.get_search_endpoint()}?{search_query}'
         # interacts with Spotify API and retrieves the top search query
-        response_search_query = requests.get(lookup_url, headers=SearchEngine.form_header())
+        response_search_query = requests.get(lookup_url, headers=self.get_search_header())
         return response_search_query
 
     def form_header_results(self):  # shouldn't be static
-        token_from_client_auth = self.InvokeAuthFromClient.get_access_token()
         return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
-            'Authorization': f'Bearer {token_from_client_auth}'
+            'Authorization': f'Bearer {self.InvokeAuthFromClient.get_access_token()}'
         }
 
     def get_artist_top_tracks(self, response_search_query):
@@ -257,18 +266,6 @@ def send_GUI_query_to_backend():
     return dropdown_option, search_field
 
 
-def list_artist_top_10_GUI(response_data):
-    for i in range(10):
-        top = response_data['tracks'][i]['name']
-        print(f'{i + 1} {top}')
-
-
-def list_album_tracklist(response_data):
-    for i in range(len(response_data['items'])):
-        tracklist = response_data['items'][i]['name']
-        print(f'{i + 1} {tracklist}')
-
-
 def invoke_search_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
@@ -277,12 +274,12 @@ def invoke_search_from_frontend():
     if dropdown_option == 'artist':
         response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
         response_data = response.json()
-        list_artist_top_10_GUI(response_data)
+        SearchEngine_invoke.list_artist_top_10_GUI(response_data)
         TrackInfo.get_artist_top_track_ids(response_data)
     elif dropdown_option == 'album':
         response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
         response_data = response.json()
-        list_album_tracklist(response_data)
+        SearchEngine_invoke.list_album_tracklist(response_data)
         TrackInfo.get_album_tracklist_ids(response_data)
     elif dropdown_option == 'track':
         pass
