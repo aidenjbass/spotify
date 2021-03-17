@@ -314,7 +314,7 @@ search_field_entry.place(relx=0.5, rely=0.5, anchor='center')
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
 login.place(relx=0.5, rely=0.7, anchor='center')
 
-execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_search_from_frontend())
+execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
 execute.place(relx=0.5, rely=0.9, anchor='center')
 
 dropdown_option = None
@@ -342,30 +342,36 @@ def send_GUI_query_to_backend():
     return dropdown_option, search_field
 
 
-def invoke_search_from_frontend():
+def invoke_from_frontend():
     send_GUI_query_to_backend()
     # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
-    SearchEngine_invoke = SearchEngine()
-    TrackInfo_invoke = TrackInfo()
-    search_2 = SearchEngine_invoke.make_search_query(search_field_query=search_field, search_type_query=dropdown_option)
-    if dropdown_option == 'artist':
-        response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
-        response_data = response.json()
-        SearchEngine_invoke.list_artist_top_10_GUI(response_data)
-        TrackInfo_invoke.get_artist_top_track_ids(response_data)
-        TrackInfo_invoke.get_track_info(response_data)
-    elif dropdown_option == 'album':
-        response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
-        response_data = response.json()
-        SearchEngine_invoke.list_album_tracklist(response_data)
-        TrackInfo_invoke.get_album_tracklist_ids(response_data)
-        TrackInfo_invoke.get_track_info(response_data)
-    elif dropdown_option == 'track':
-        response = SearchEngine_invoke.get_track(response_search_query=search_2)
-        response_data = response.json()
-        SearchEngine_invoke.list_track(response_data)
-        TrackInfo_invoke.get_track_id(response_data)
-        TrackInfo_invoke.get_track_info(response_data)
+    if search_field is not None and search_field != '' and dropdown_option != 'option':
+        SearchEngine_invoke = SearchEngine()
+        TrackInfo_invoke = TrackInfo()
+        search_2 = SearchEngine_invoke.make_search_query(
+            search_field_query=search_field,
+            search_type_query=dropdown_option
+        )
+        if dropdown_option == 'artist':
+            response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
+            response_data = response.json()
+            SearchEngine_invoke.list_artist_top_10_GUI(response_data)
+            TrackInfo_invoke.get_artist_top_track_ids(response_data)
+            TrackInfo_invoke.get_track_info(response_data)
+        elif dropdown_option == 'album':
+            response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
+            response_data = response.json()
+            SearchEngine_invoke.list_album_tracklist(response_data)
+            TrackInfo_invoke.get_album_tracklist_ids(response_data)
+            TrackInfo_invoke.get_track_info(response_data)
+        elif dropdown_option == 'track':
+            response = SearchEngine_invoke.get_track(response_search_query=search_2)
+            response_data = response.json()
+            SearchEngine_invoke.list_track(response_data)
+            TrackInfo_invoke.get_track_id(response_data)
+            TrackInfo_invoke.get_track_info(response_data)
+        else:
+            pass
     else:
         pass
 
