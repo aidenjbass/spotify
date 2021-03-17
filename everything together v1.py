@@ -8,6 +8,7 @@ import requests
 import webview
 import pandas as pd
 import io
+from tabulate import tabulate
 
 # project imports
 import secrets
@@ -279,7 +280,7 @@ def center_tkinter_window():  # Centers window on any display
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=800, width=1200)  # gives minimum size in px
     base.resizable(True, True)  # disables ability to resize window if FALSE
-    base.wm_attributes('-topmost', 1)  # always on top
+    # base.wm_attributes('-topmost', 1)  # always on top
 
 
 center_tkinter_window()
@@ -401,9 +402,32 @@ def invoke_from_frontend():
                 'time_signature'
             ]])
 
-            with pd.option_context('expand_frame_repr', False):
-                GUI_output = tk.Label(base, text=df_track_info_merged, width=80)
-                GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+            tabulate.PRESERVE_WHITESPACE = True
+
+            df_track_info_merged_tabulated = tabulate(
+                df_track_info_merged,
+                showindex=False,
+                headers=df_track_info_merged.columns,
+                stralign='left',
+                numalign='left'
+            )
+
+            print(df_track_info_merged_tabulated)
+
+            show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
+            show_result_window.place(relx=0.5, rely=0.5, anchor='center')
+
+            def make_newWindow():
+                with pd.option_context('expand_frame_repr', False):
+                    newWindow = tk.Toplevel(base)
+                    newWindow.geometry('600x600')
+                    GUI_output = tk.Label(
+                        newWindow,
+                        text=str(df_track_info_merged_tabulated),
+                        padx=None, pady=None,
+                        justify='left',
+                    )
+                    GUI_output.place(relx=0.5, rely=0.5, anchor='center')
 
         elif dropdown_option == 'album':
             response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
