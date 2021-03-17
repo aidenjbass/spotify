@@ -115,7 +115,7 @@ class SearchEngine(object):
 
     @staticmethod
     def list_track(response_data):
-        track_name = response_data['album']['name']
+        track_name = response_data['name']
         print(track_name)
         return track_name
 
@@ -228,7 +228,7 @@ class TrackInfo(object):
 
     @staticmethod
     def get_track_id(response_data):
-        track_id = response_data['album']['id']
+        track_id = response_data['id']
         return track_id
 
     def form_header(self):
@@ -243,12 +243,10 @@ class TrackInfo(object):
         # GET https://api.spotify.com/v1/audio-features
         if dropdown_option == 'artist':
             track_ids = self.get_artist_top_track_ids(response_data)
-            print(track_ids)
         elif dropdown_option == 'album':
             track_ids = self.get_album_tracklist_ids(response_data)
-            print(track_ids)
         elif dropdown_option == 'track':
-            pass
+            track_ids = self.get_track_id(response_data)
         else:
             pass
         endpoint = 'https://api.spotify.com/v1/audio-features?'
@@ -285,11 +283,9 @@ center_tkinter_window()
 '''
 Beginning of widgets
 '''
-# variable setting
-choice = tk.StringVar(base)
 
-# dictionary of options
-choices = ['Artist', 'Album', 'Track']
+choice = tk.StringVar(base)  # variable setting
+choices = ['Artist', 'Album', 'Track']  # dictionary of options
 choice.set('Option')  # set the default option
 
 
