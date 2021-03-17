@@ -402,30 +402,24 @@ def invoke_from_frontend():
                 'time_signature'
             ]])
 
-            tabulate.PRESERVE_WHITESPACE = True
-
-            df_track_info_merged_tabulated = tabulate(
-                df_track_info_merged,
-                showindex=False,
-                headers=df_track_info_merged.columns,
-                stralign='left',
-                numalign='left'
-            )
-
-            print(df_track_info_merged_tabulated)
-
             show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
             show_result_window.place(relx=0.5, rely=0.5, anchor='center')
 
+            tabulate.PRESERVE_WHITESPACE = True
+
             def make_newWindow():
-                with pd.option_context('expand_frame_repr', False):
+                with pd.option_context('expand_frame_repr', True):
                     newWindow = tk.Toplevel(base)
                     newWindow.geometry('600x600')
                     GUI_output = tk.Label(
                         newWindow,
-                        text=str(df_track_info_merged_tabulated),
+                        text=(tabulate(
+                            df_track_info_merged,
+                            showindex=False,
+                            headers=df_track_info_merged.columns,
+                        )),
                         padx=None, pady=None,
-                        justify='left',
+                        justify='right'
                     )
                     GUI_output.place(relx=0.5, rely=0.5, anchor='center')
 
