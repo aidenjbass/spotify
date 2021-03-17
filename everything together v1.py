@@ -99,20 +99,25 @@ class SearchEngine(object):
 
     @staticmethod
     def list_artist_top_10_GUI(response_data):
+        top = ''
         for i in range(10):
             top = response_data['tracks'][i]['name']
             print(f'{i + 1} {top}')
+        return top
 
     @staticmethod
     def list_album_tracklist(response_data):
+        tracklist = ''
         for i in range(len(response_data['items'])):
             tracklist = response_data['items'][i]['name']
             print(f'{i + 1} {tracklist}')
+        return tracklist
 
     @staticmethod
     def list_track(response_data):
-        track = response_data['tracks']['items'][0]['name']
-        print(track)
+        track_name = response_data['album']['name']
+        print(track_name)
+        return track_name
 
     def get_search_header(self):
         return {
@@ -179,6 +184,21 @@ class SearchEngine(object):
         )
         return album_listing_request
 
+    def get_track(self, response_search_query):
+        response_track_search = response_search_query.json()
+        track_id = response_track_search['tracks']['items'][0]['id']
+        # GET https://api.spotify.com/v1/tracks/{id}
+        endpoint = 'https://api.spotify.com/v1/tracks/'
+        market = urlencode({
+            'market': 'US'
+        })
+        track_listing_url = f'{endpoint}{track_id}?{market}'
+        track_listing_request = requests.get(
+            track_listing_url,
+            headers=self.form_header_results()
+        )
+        return track_listing_request
+
 
 class TrackInfo(object):
     InvokeAuthFromClient = ClientAuth(cid, secret)
@@ -207,9 +227,8 @@ class TrackInfo(object):
         return form_tracklist_id
 
     @staticmethod
-    def get_track_ids(response_data):
-        track_id = response_data['tracks']['items'][0]['id']
-        print(track_id)
+    def get_track_id(response_data):
+        track_id = response_data['album']['id']
         return track_id
 
     def form_header(self):
@@ -234,7 +253,6 @@ class TrackInfo(object):
             pass
         endpoint = 'https://api.spotify.com/v1/audio-features?'
         track_info_url = f'{endpoint}ids={track_ids}'
-        print(track_info_url)
         track_info_request = requests.get(
             track_info_url,
             headers=self.form_header()
@@ -347,7 +365,11 @@ def invoke_search_from_frontend():
         TrackInfo_invoke.get_album_tracklist_ids(response_data)
         TrackInfo_invoke.get_track_info(response_data)
     elif dropdown_option == 'track':
-        pass
+        response = SearchEngine_invoke.get_track(response_search_query=search_2)
+        response_data = response.json()
+        SearchEngine_invoke.list_track(response_data)
+        TrackInfo_invoke.get_track_id(response_data)
+        TrackInfo_invoke.get_track_info(response_data)
     else:
         pass
 
