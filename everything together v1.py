@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 import base64
 import datetime
 import tkinter as tk
+from tkinter import messagebox
 import requests
 import webview
 
@@ -372,6 +373,10 @@ def invoke_from_frontend():
             TrackInfo_invoke.get_track_info(response_data)
         else:
             pass
+    elif search_field is None or search_field != '':
+        tk.messagebox.showwarning(title="Warning", message="Search invalid")
+    elif dropdown_option == 'option':
+        tk.messagebox.showwarning(title="Warning", message="Option not chosen")
     else:
         pass
 
