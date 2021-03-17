@@ -6,6 +6,8 @@ import tkinter as tk
 from tkinter import messagebox
 import requests
 import webview
+import pandas as pd
+import io
 
 # project imports
 import secrets
@@ -100,11 +102,11 @@ class SearchEngine(object):
 
     @staticmethod
     def list_artist_top_10_GUI(response_data):
-        top = ''
+        form_top = ''
         for i in range(10):
             top = response_data['tracks'][i]['name']
-            print(f'{i + 1} {top}')
-        return top
+            form_top = str(f'{form_top}{top}\n')
+        return form_top
 
     @staticmethod
     def list_album_tracklist(response_data):
@@ -256,7 +258,8 @@ class TrackInfo(object):
             track_info_url,
             headers=self.form_header()
         )
-        print(track_info_request.json())
+        # print(track_info_request.json())
+        return track_info_request.json()
 
 
 '''
@@ -270,12 +273,12 @@ def center_tkinter_window():  # Centers window on any display
     window_width = base.winfo_reqwidth()  # gets width of tk window
     window_height = base.winfo_reqheight()  # gets height of tk window
 
-    posx = int(base.winfo_screenwidth() / 2.35 - window_width / 2)
-    posy = int(base.winfo_screenheight() / 3 - window_height / 2)
+    posx = int(base.winfo_screenwidth() / 3.8 - window_width / 2)
+    posy = int(base.winfo_screenheight() / 4 - window_height / 2)
 
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
-    base.config(height=500, width=500)  # gives minimum size in px
-    base.resizable(False, False)  # disables ability to resize window
+    base.config(height=800, width=1200)  # gives minimum size in px
+    base.resizable(True, True)  # disables ability to resize window if FALSE
     base.wm_attributes('-topmost', 1)  # always on top
 
 
@@ -301,22 +304,22 @@ def get_change_dropdown(*args):
 choice.trace('w', get_change_dropdown)  # link function to change dropdown
 
 popupMenu_label = tk.Label(base, text="Choose an option from the list below")
-popupMenu_label.place(relx=0.5, rely=0.2, anchor='center')
+popupMenu_label.place(relx=0.2, rely=0.2, anchor='center')
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
-popupMenu.place(relx=0.5, rely=0.3, anchor='center')
+popupMenu.place(relx=0.2, rely=0.25, anchor='center')
 
 search_field_label = tk.Label(base, text="What would you like to search for?")
-search_field_label.place(relx=0.5, rely=0.4, anchor='center')
+search_field_label.place(relx=0.2, rely=0.4, anchor='center')
 
 search_field_entry = tk.Entry(base)
-search_field_entry.place(relx=0.5, rely=0.5, anchor='center')
+search_field_entry.place(relx=0.2, rely=0.45, anchor='center')
 
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
-login.place(relx=0.5, rely=0.7, anchor='center')
+login.place(relx=0.2, rely=0.7, anchor='center')
 
 execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
-execute.place(relx=0.5, rely=0.9, anchor='center')
+execute.place(relx=0.2, rely=0.9, anchor='center')
 
 dropdown_option = None
 search_field = None
@@ -356,9 +359,52 @@ def invoke_from_frontend():
         if dropdown_option == 'artist':
             response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
             response_data = response.json()
-            SearchEngine_invoke.list_artist_top_10_GUI(response_data)
+            top_10 = SearchEngine_invoke.list_artist_top_10_GUI(response_data)
             TrackInfo_invoke.get_artist_top_track_ids(response_data)
-            TrackInfo_invoke.get_track_info(response_data)
+            track_features = TrackInfo_invoke.get_track_info(response_data)
+
+            pd.set_option('display.max_columns', None)
+
+            data = io.StringIO(top_10)
+            df_track_names = pd.read_csv(
+                data,
+                sep="\n",
+                names=['name']
+            )
+            df_track_names.index += 1
+
+            df_track_features = pd.json_normalize(track_features['audio_features'])
+            df_track_features.index += 1
+
+            df_track_info_merged = df_track_names.merge(
+                df_track_features,
+                how='outer',
+                left_index=True,
+                right_index=True
+            )
+
+            df_track_info_merged = (df_track_info_merged[[
+                'name',
+                'danceability',
+                'energy',
+                'key',
+                # 'loudness',
+                'mode',
+                # 'speechiness',
+                # 'acousticness',
+                # 'instrumentalness',
+                # 'liveness',
+                # 'valence',
+                'tempo',
+                # 'id',
+                'duration_ms',
+                'time_signature'
+            ]])
+
+            with pd.option_context('expand_frame_repr', False):
+                GUI_output = tk.Label(base, text=df_track_info_merged, width=80)
+                GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+
         elif dropdown_option == 'album':
             response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
             response_data = response.json()
