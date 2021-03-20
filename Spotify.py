@@ -60,7 +60,7 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
                            headers=token_headers)
         valid_request = r1.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
-            raise Exception('Authetication failed')
+            raise Exception('Authentication failed')
         else:
             response_data = r1.json()
             now = datetime.datetime.now()
