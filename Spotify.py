@@ -16,18 +16,17 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
     token = None
     token_expires_at = datetime.datetime.now()
     token_has_expired = True
-    token_url = "https://accounts.spotify.com/api/token"
+    token_url = 'https://accounts.spotify.com/api/token'
 
     # client_id and and client_secret are now constants stored in the external file secrets.py
     client_id = None
     client_secret = None
 
-    def __init__(self, client_id, client_secret):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, client_id, client_secret):  # initializes class with self parameter
+        self.client_id = client_id  # passes client_id into class
+        self.client_secret = client_secret  # passes client_secret into class
 
-    def get_client_credentials(self):
-        # returns the base64 string
+    def get_client_credentials(self):  # returns the base64 string
         client_id = self.client_id
         client_secret = self.client_secret
         if client_id is None or client_secret is None:
@@ -49,15 +48,17 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
             'Authorization': f'Basic {client_credentials_base64}'
         }
 
-    def authenticate(self):
+    def authenticate(self):  # makes API request to get token response data
         # calling constants returned from previous functions
         access_token_url = self.token_url
         token_data = self.get_token_data()
         token_headers = self.get_token_header()
         # calls API to retrieve the client token used throughout the program later on to interact with API
-        r1 = requests.post(access_token_url,
-                           data=token_data,
-                           headers=token_headers)
+        r1 = requests.post(
+            access_token_url,
+            data=token_data,
+            headers=token_headers
+        )
         valid_request = r1.status_code in range(200, 299)  # anything outside this range is invalid
         if valid_request is False:
             raise Exception('Authentication failed')
@@ -75,21 +76,20 @@ class ClientAuth(object):  # this class is just for the Client authentication pa
     def get_access_token(self):
         token = self.token
         expires_at = self.token_expires_at  # gives the DD/MM/YYYY HH:MM:SS format of when token expires
-        now = datetime.datetime.now()
+        now = datetime.datetime.now()  # gives the DD/MM/YYYY HH:MM:SS format of time NOW
         if expires_at < now:  # if when the token expires is before NOW, token is invalid and must be re-authenticated
             self.authenticate()
             return self.get_access_token()
-        elif token is None:  # if the token variable is 'None' or 'Null', must be re-authenticated
+        elif token is None:  # if the variable 'token' is 'None' or 'Null', must be re-authenticated
             self.authenticate()
             return self.get_access_token()
         else:  # otherwise, if the token is valid, not None and is later than time NOW, re-authentication is not needed
             return token
 
 
-class SearchEngine(object):
-    InvokeAuthFromClient = ClientAuth(cid, secret)
-    InvokeAuthFromClient.authenticate()
-    token = InvokeAuthFromClient.get_access_token()
+class SearchEngine(object):  # this class is just for the API requests that involves the /search/ endpoint
+    InvokeAuthFromClient = ClientAuth(cid, secret)  # passes cid and secret into ClientAuth class and invokes class
+    token = InvokeAuthFromClient.get_access_token()  # executes get_access_token() func and returns token
 
     # print(token)
 
