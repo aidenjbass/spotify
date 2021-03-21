@@ -266,9 +266,6 @@ class TrackInfo(object):
         # pandas option setting
         pd.set_option('display.max_columns', None)
 
-        # tabulate option setting
-        tabulate.PRESERVE_WHITESPACE = True
-
         track_features = self.get_track_info(response_data)
 
         data = io.StringIO(tracklist)
@@ -289,7 +286,7 @@ class TrackInfo(object):
             right_index=True
         )
 
-        df_track_info_merged = (df_track_info_merged[[
+        df_track_info_merged_cats = (df_track_info_merged[[
             'name',
             'danceability',
             'energy',
@@ -307,8 +304,16 @@ class TrackInfo(object):
             'time_signature'
         ]])
 
-        print(df_track_info_merged)
-        return df_track_info_merged
+        df_track_info_merged_round = df_track_info_merged_cats.round({
+            'danceability': 1,
+            'energy': 1,
+            'tempo': 0
+        })
+
+        duplicateRowsDF = df_track_info_merged_round[df_track_info_merged_round.duplicated(['key'])]
+        print(duplicateRowsDF)
+
+        return df_track_info_merged_round
 
 
 '''
@@ -376,7 +381,7 @@ search_field = None
 
 def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
     webview.create_window(
-        title="Spotify Authentication",
+        title="Spotify User Authentication",
         url='http://google.com',
         confirm_close=False
     )
@@ -388,20 +393,26 @@ def output_results_to_GUI(df_track_info_merged):
     show_result_window.place(relx=0.5, rely=0.5, anchor='center')
 
     def make_newWindow():
-        with pd.option_context('expand_frame_repr', True):
-            newWindow = tk.Toplevel(base)
-            newWindow.geometry("%dx%d" % (base.winfo_reqwidth(), base.winfo_reqheight()))
-            GUI_output = tk.Label(
-                newWindow,
-                text=(tabulate(
-                    df_track_info_merged,
-                    showindex=False,
-                    headers=df_track_info_merged.columns,
-                )),
-                padx=None, pady=None,
-                justify='right'
-            )
-            GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+        # tabulate option setting
+        tabulate.PRESERVE_WHITESPACE = False
+
+        newWindow = tk.Toplevel(base)
+        GUI_output = tk.Label(
+            newWindow,
+            text=(tabulate(
+                df_track_info_merged,
+                showindex=False,
+                headers='keys',
+                tablefmt='psql'
+            )),
+            font='Courier',
+        )
+
+        newWindow.geometry('%dx%d' % (GUI_output.winfo_reqwidth(), GUI_output.winfo_reqheight()))
+        newWindow.resizable(False, False)  # disables ability to resize window if FALSE
+        newWindow.wm_attributes('-topmost', 1)  # always on top
+
+        GUI_output.place(relx=0.5, rely=0.5, anchor='center')
 
 
 def get_search_field_entry():
@@ -452,7 +463,7 @@ def invoke_from_frontend():
             TrackInfo_invoke.get_track_info(response_data)
         else:
             pass
-    elif search_field is None or search_field != '':
+    elif search_field is None or search_field == '':
         tk.messagebox.showwarning(title="Warning", message="Search invalid")
     elif dropdown_option == 'option':
         tk.messagebox.showwarning(title="Warning", message="Option not chosen")
