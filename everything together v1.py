@@ -16,6 +16,30 @@ import secrets
 cid = secrets.spotify_cid
 secret = secrets.spotify_csecret
 
+# dict that converts musical key from numerical notation to lettered notation
+# uses standard pitch class notation
+music_key = {
+        0: 'C',
+        1: 'C#',
+        2: 'D',
+        3: 'D#',
+        4: 'E',
+        5: 'F',
+        6: 'F#',
+        7: 'G',
+        8: 'G#',
+        9: 'A',
+        10: 'A#',
+        11: 'B'
+    }
+
+# function that converts musical mode (major/minor) in numerical notation to lettered notation
+# uses standard notation
+music_mode = {
+        0: 'Minor',
+        1: 'Major'
+    }
+
 
 class ClientAuth(object):  # this class is just for the client authentication
 
@@ -310,6 +334,9 @@ class TrackInfo(object):
             'tempo': 0
         })
 
+        df_track_info_merged_round['key'] = df_track_info_merged_round['key'].map({music_key})
+        df_track_info_merged_round['mode'] = df_track_info_merged_round['mode'].map({music_mode})
+
         return df_track_info_merged_round
 
     @staticmethod
@@ -494,27 +521,3 @@ def invoke_from_frontend():
 
 
 base.mainloop()
-
-# dictionary that converts musical key from numerical notation to lettered notation
-# uses standard pitch class notation
-music_key = {
-        '0': 'C',
-        '1': 'C#',
-        '2': 'D',
-        '3': 'D#',
-        '4': 'E',
-        '5': 'F',
-        '6': 'F#',
-        '7': 'G',
-        '8': 'G#',
-        '9': 'A',
-        '10': 'A#',
-        '11': 'B',
-    }
-
-# dictionary that converts musical mode (major/minor) in numerical notation to lettered notation
-# uses standard notation
-music_mode = {
-    '0': 'Minor',
-    '1': 'Major',
-}
