@@ -111,11 +111,11 @@ class SearchEngine(object):
 
     @staticmethod
     def list_album_tracklist(response_data):
-        tracklist = ''
+        form_tracklist = ''
         for i in range(len(response_data['items'])):
             tracklist = response_data['items'][i]['name']
-            print(f'{i + 1} {tracklist}')
-        return tracklist
+            form_tracklist = str(f'{form_tracklist}{tracklist}\n')
+        return form_tracklist
 
     @staticmethod
     def list_track(response_data):
@@ -262,6 +262,54 @@ class TrackInfo(object):
         # print(track_info_request.json())
         return track_info_request.json()
 
+    def print_track_audio_features(self, response_data, tracklist):
+        # pandas option setting
+        pd.set_option('display.max_columns', None)
+
+        # tabulate option setting
+        tabulate.PRESERVE_WHITESPACE = True
+
+        track_features = self.get_track_info(response_data)
+
+        data = io.StringIO(tracklist)
+        df_track_names = pd.read_csv(
+            data,
+            sep='\n',
+            names=['name']
+        )
+        df_track_names.index += 1
+
+        df_track_features = pd.json_normalize(track_features['audio_features'])
+        df_track_features.index += 1
+
+        df_track_info_merged = df_track_names.merge(
+            df_track_features,
+            how='outer',
+            left_index=True,
+            right_index=True
+        )
+
+        df_track_info_merged = (df_track_info_merged[[
+            'name',
+            'danceability',
+            'energy',
+            'key',
+            # 'loudness',
+            'mode',
+            # 'speechiness',
+            # 'acousticness',
+            # 'instrumentalness',
+            # 'liveness',
+            # 'valence',
+            'tempo',
+            # 'id',
+            'duration_ms',
+            'time_signature'
+        ]])
+
+        print(df_track_info_merged)
+        return df_track_info_merged
+
 
 '''
 *** FRONTEND STARTS HERE ***
@@ -335,6 +383,27 @@ def web_launch():  # using the pywebiew module to launch a lightweight chromium-
     webview.start()
 
 
+def output_results_to_GUI(df_track_info_merged):
+    show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
+    show_result_window.place(relx=0.5, rely=0.5, anchor='center')
+
+    def make_newWindow():
+        with pd.option_context('expand_frame_repr', True):
+            newWindow = tk.Toplevel(base)
+            newWindow.geometry("%dx%d" % (base.winfo_reqwidth(), base.winfo_reqheight()))
+            GUI_output = tk.Label(
+                newWindow,
+                text=(tabulate(
+                    df_track_info_merged,
+                    showindex=False,
+                    headers=df_track_info_merged.columns,
+                )),
+                padx=None, pady=None,
+                justify='right'
+            )
+            GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+
+
 def get_search_field_entry():
     search_field_GUI = str(search_field_entry.get())
     return search_field_GUI
@@ -360,75 +429,21 @@ def invoke_from_frontend():
         if dropdown_option == 'artist':
             response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
             response_data = response.json()
-            top_10 = SearchEngine_invoke.list_artist_top_10_GUI(response_data)
+            tracklist = SearchEngine_invoke.list_artist_top_10_GUI(response_data)
             TrackInfo_invoke.get_artist_top_track_ids(response_data)
-            track_features = TrackInfo_invoke.get_track_info(response_data)
 
-            pd.set_option('display.max_columns', None)
-
-            data = io.StringIO(top_10)
-            df_track_names = pd.read_csv(
-                data,
-                sep="\n",
-                names=['name']
-            )
-            df_track_names.index += 1
-
-            df_track_features = pd.json_normalize(track_features['audio_features'])
-            df_track_features.index += 1
-
-            df_track_info_merged = df_track_names.merge(
-                df_track_features,
-                how='outer',
-                left_index=True,
-                right_index=True
-            )
-
-            df_track_info_merged = (df_track_info_merged[[
-                'name',
-                'danceability',
-                'energy',
-                'key',
-                # 'loudness',
-                'mode',
-                # 'speechiness',
-                # 'acousticness',
-                # 'instrumentalness',
-                # 'liveness',
-                # 'valence',
-                'tempo',
-                # 'id',
-                'duration_ms',
-                'time_signature'
-            ]])
-
-            show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
-            show_result_window.place(relx=0.5, rely=0.5, anchor='center')
-
-            tabulate.PRESERVE_WHITESPACE = True
-
-            def make_newWindow():
-                with pd.option_context('expand_frame_repr', True):
-                    newWindow = tk.Toplevel(base)
-                    newWindow.geometry('600x600')
-                    GUI_output = tk.Label(
-                        newWindow,
-                        text=(tabulate(
-                            df_track_info_merged,
-                            showindex=False,
-                            headers=df_track_info_merged.columns,
-                        )),
-                        padx=None, pady=None,
-                        justify='right'
-                    )
-                    GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+            df_track_info_merged = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
+            output_results_to_GUI(df_track_info_merged)
 
         elif dropdown_option == 'album':
             response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
             response_data = response.json()
-            SearchEngine_invoke.list_album_tracklist(response_data)
+            tracklist = SearchEngine_invoke.list_album_tracklist(response_data)
             TrackInfo_invoke.get_album_tracklist_ids(response_data)
-            TrackInfo_invoke.get_track_info(response_data)
+
+            df_track_info_merged = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
+            output_results_to_GUI(df_track_info_merged)
+
         elif dropdown_option == 'track':
             response = SearchEngine_invoke.get_track(response_search_query=search_2)
             response_data = response.json()
