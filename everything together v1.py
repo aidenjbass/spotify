@@ -290,8 +290,6 @@ class TrackInfo(object):
         # pandas option setting
         pd.set_option('display.max_columns', None)
 
-        track_features = self.get_track_info(response_data)
-
         data = io.StringIO(tracklist)
         df_track_names = pd.read_csv(
             data,
@@ -300,6 +298,7 @@ class TrackInfo(object):
         )
         df_track_names.index += 1
 
+        track_features = self.get_track_info(response_data)
         df_track_features = pd.json_normalize(track_features['audio_features'])
         df_track_features.index += 1
 
@@ -324,17 +323,14 @@ class TrackInfo(object):
             # 'valence',
             'tempo',
             # 'id',
+            # 'uri',
+            # 'track_href',
+            # 'analysis_url',
             'duration_ms',
             'time_signature'
         ]])
 
-        df_track_info_merged_round = df_track_info_merged_cats.round({
-            'danceability': 1,
-            'energy': 1,
-            'tempo': 0
-        })
-
-        df_track_info_merged_round['key'] = df_track_info_merged_round['key'].map({
+        df_track_info_merged_cats['key'] = df_track_info_merged_cats['key'].map({
             0: 'C',
             1: 'C#',
             2: 'D',
@@ -349,9 +345,16 @@ class TrackInfo(object):
             11: 'B'
 
         })
-        df_track_info_merged_round['mode'] = df_track_info_merged_round['mode'].map({
+
+        df_track_info_merged_cats['mode'] = df_track_info_merged_cats['mode'].map({
             0: 'Minor',
             1: 'Major'
+        })
+
+        df_track_info_merged_round = df_track_info_merged_cats.round({
+            'danceability': 1,
+            'energy': 1,
+            'tempo': 0
         })
 
         return df_track_info_merged_round
@@ -526,9 +529,9 @@ def invoke_from_frontend():
         else:
             pass
     elif search_field is None or search_field == '':
-        tk.messagebox.showwarning(title="Warning", message="Search invalid")
+        tk.messagebox.showwarning(title='Warning', message="Search invalid")
     elif dropdown_option == 'option':
-        tk.messagebox.showwarning(title="Warning", message="Option not chosen")
+        tk.messagebox.showwarning(title='Warning', message="Option not chosen")
     else:
         pass
 
