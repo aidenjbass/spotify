@@ -310,10 +310,14 @@ class TrackInfo(object):
             'tempo': 0
         })
 
-        duplicateRowsDF = df_track_info_merged_round[df_track_info_merged_round.duplicated(['key'])]
-        print(duplicateRowsDF)
-
         return df_track_info_merged_round
+
+    @staticmethod
+    def track_info_key_comparison(df):
+        similar_key = df[df.duplicated(['key'], keep=False)]
+        similar_key_sorted = similar_key.sort_values(by=['key'])
+        # print(similar_key_sorted)
+        return similar_key_sorted
 
 
 '''
@@ -388,7 +392,7 @@ def web_launch():  # using the pywebiew module to launch a lightweight chromium-
     webview.start()
 
 
-def output_results_to_GUI(df_track_info_merged):
+def output_results_to_GUI(df_track_info_merged, df_similar_key):
     show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
     show_result_window.place(relx=0.5, rely=0.5, anchor='center')
 
@@ -397,7 +401,8 @@ def output_results_to_GUI(df_track_info_merged):
         tabulate.PRESERVE_WHITESPACE = False
 
         newWindow = tk.Toplevel(base)
-        GUI_output = tk.Label(
+
+        GUI_output_full_result = tk.Label(
             newWindow,
             text=(tabulate(
                 df_track_info_merged,
@@ -405,14 +410,29 @@ def output_results_to_GUI(df_track_info_merged):
                 headers='keys',
                 tablefmt='psql'
             )),
-            font='Courier',
+            font='Courier'
         )
 
-        newWindow.geometry('%dx%d' % (GUI_output.winfo_reqwidth(), GUI_output.winfo_reqheight()))
+        GUI_output_similar_key = tk.Label(
+            newWindow,
+            text=(tabulate(
+                df_similar_key,
+                showindex=False,
+                headers='keys',
+                tablefmt='psql'
+            )),
+            font='Courier'
+        )
+
+        width = (GUI_output_full_result.winfo_reqwidth())
+        height = (GUI_output_full_result.winfo_reqheight() + GUI_output_similar_key.winfo_reqheight())
+
+        newWindow.geometry('%dx%d' % (width, height))
         newWindow.resizable(False, False)  # disables ability to resize window if FALSE
         newWindow.wm_attributes('-topmost', 1)  # always on top
 
-        GUI_output.place(relx=0.5, rely=0.5, anchor='center')
+        GUI_output_full_result.place(relx=0.5, rely=0.3, anchor='center')
+        GUI_output_similar_key.place(relx=0.5, rely=0.8, anchor='center')
 
 
 def get_search_field_entry():
@@ -443,8 +463,9 @@ def invoke_from_frontend():
             tracklist = SearchEngine_invoke.list_artist_top_10_GUI(response_data)
             TrackInfo_invoke.get_artist_top_track_ids(response_data)
 
-            df_track_info_merged = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
-            output_results_to_GUI(df_track_info_merged)
+            df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
+            df_similar_key = TrackInfo_invoke.track_info_key_comparison(df=df_track_info)
+            output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'album':
             response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
@@ -452,8 +473,9 @@ def invoke_from_frontend():
             tracklist = SearchEngine_invoke.list_album_tracklist(response_data)
             TrackInfo_invoke.get_album_tracklist_ids(response_data)
 
-            df_track_info_merged = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
-            output_results_to_GUI(df_track_info_merged)
+            df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
+            df_similar_key = TrackInfo_invoke.track_info_key_comparison(df=df_track_info)
+            output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'track':
             response = SearchEngine_invoke.get_track(response_search_query=search_2)
