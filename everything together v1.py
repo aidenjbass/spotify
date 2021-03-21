@@ -463,7 +463,7 @@ def invoke_from_frontend():
 base.mainloop()
 
 
-def music_key_numerical_to_letter():
+def music_key_convert():
     # function that converts musical key from numerical notation to lettered notation
     # uses standard pitch class notation
     return {
@@ -479,14 +479,13 @@ def music_key_numerical_to_letter():
         '9': 'A',
         '10': 'A#',
         '11': 'B',
-        '12': 'B#'
     }
 
 
-def music_mode_numerical_to_letter():
+def music_mode_convert():
     # function that converts musical mode (major/minor) in numerical notation to lettered notation
     # uses standard notation
     return {
         '0': 'Minor',
-        '1': 'Major'
+        '1': 'Major',
     }
