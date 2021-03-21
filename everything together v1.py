@@ -471,8 +471,8 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
         newWindow.resizable(False, False)  # disables ability to resize window if FALSE
         newWindow.wm_attributes('-topmost', 1)  # always on top
 
-        GUI_output_full_result.place(relx=0.5, rely=0.3, anchor='center')
-        GUI_output_similar_key.place(relx=0.5, rely=0.8, anchor='center')
+        GUI_output_full_result.pack(side=tk.TOP)
+        GUI_output_similar_key.pack(side=tk.TOP)
 
 
 def get_search_field_entry():
