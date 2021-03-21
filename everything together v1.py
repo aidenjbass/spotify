@@ -1,13 +1,14 @@
 # external imports
-from urllib.parse import urlencode
 import base64
 import datetime
+import io
 import tkinter as tk
 from tkinter import messagebox
+from urllib.parse import urlencode
+
+import pandas as pd
 import requests
 import webview
-import pandas as pd
-import io
 from tabulate import tabulate
 
 # project imports
