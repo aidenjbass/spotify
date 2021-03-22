@@ -275,16 +275,17 @@ class TrackInfo(object):
     def get_track_info(self, response_data):
         track_ids = ''
         # GET https://api.spotify.com/v1/audio-features
-        if dropdown_option == 'artist':
+        if dropdown_option == 'artist':  # if artist passes response_data to artist function
             track_ids = self.get_artist_top_track_ids(response_data)
-        elif dropdown_option == 'album':
+        elif dropdown_option == 'album':  # if album passes response_data to album function
             track_ids = self.get_album_tracklist_ids(response_data)
-        elif dropdown_option == 'track':
+        elif dropdown_option == 'track':  # if track passes response_data to track function
             track_ids = self.get_track_id(response_data)
         else:
             pass
-        endpoint = 'https://api.spotify.com/v1/audio-features?'
-        track_info_url = f'{endpoint}ids={track_ids}'
+        endpoint = 'https://api.spotify.com/v1/audio-features?'  # endpoint for audio_features
+        track_info_url = f'{endpoint}ids={track_ids}'  # forms URL
+        # makes request for audio_features object json
         track_info_request = requests.get(
             track_info_url,
             headers=self.form_header()
@@ -294,28 +295,30 @@ class TrackInfo(object):
 
     def print_track_audio_features(self, response_data, tracklist):
         # pandas option setting
-        pd.set_option('display.max_columns', None)
-        pd.set_option('mode.chained_assignment', None)
+        pd.set_option('display.max_columns', None)  # displays all columns
+        pd.set_option('mode.chained_assignment', None)  # overwrites same dataframe rather than copies
 
-        data = io.StringIO(tracklist)
+        data = io.StringIO(tracklist)  # uses io to make comma separated string into csv
+        # makes csv of track names with header 'name'
         df_track_names = pd.read_csv(
             data,
             sep='\n',
             names=['name']
         )
-        df_track_names.index += 1
+        df_track_names.index += 1  # adds 1 to index so index starts at 1
 
-        track_features = self.get_track_info(response_data)
-        df_track_features = pd.json_normalize(track_features['audio_features'])
-        df_track_features.index += 1
+        track_features = self.get_track_info(response_data)  # gets track_features json
+        df_track_features = pd.json_normalize(track_features['audio_features'])  # using pandas to convert json to df
+        df_track_features.index += 1  # adds 1 to index so index starts at 1
 
+        # merges df_track_names nad df_track_features into one dataframe
         df_track_info_merged = df_track_names.merge(
             df_track_features,
             how='outer',
             left_index=True,
             right_index=True
         )
-
+        # list of all columns in dataframe, commented out columns not needed for scope of program
         df_track_info_merged = (df_track_info_merged[[
             'name',
             'danceability',
@@ -337,6 +340,7 @@ class TrackInfo(object):
             'time_signature'
         ]])
 
+        # converts numerical key notation into lettered notation
         df_track_info_merged['key'] = df_track_info_merged['key'].map({
             0: 'C',
             1: 'C#',
@@ -353,32 +357,42 @@ class TrackInfo(object):
 
         })
 
+        # converts numerical modal notation into lettered notation
         df_track_info_merged['mode'] = df_track_info_merged['mode'].map({
             0: 'Minor',
             1: 'Major'
         })
 
+        # rounds float values of 'danceablity', 'energy' to 1dp and 'tempo' to 0dp
         df_track_info_merged = df_track_info_merged.round({
             'danceability': 1,
             'energy': 1,
             'tempo': 0
         })
 
+        # converts the track duration in milliseconds to HH:MM:SS format, creates new column 'track length'
         df_track_info_merged['Track Length'] = pd.to_datetime(df_track_info_merged['duration_ms'],
                                                               unit='ms').dt.strftime('%H:%M:%S').str[:]
 
+        # deletes column named 'duration_ms' from dataframe
         df_track_info_drop_duration = df_track_info_merged.drop(columns=['duration_ms'])
+
+        # renames 'time_signature' to 'Time Signature'
         df_track_info_rename_ts = df_track_info_drop_duration.rename(columns={'time_signature': 'Time Signature'})
+
+        # capitalizes all column header names
         df_track_info_caps = df_track_info_rename_ts.rename(str.capitalize, axis='columns')
 
-        return df_track_info_caps
+        return df_track_info_caps  # returns final dataframe
 
     @staticmethod
     def track_info_comparison(df):
+        # finds rows with same key and mode, 'keep' parameter is set to false to keep all duplicates
         similar_key = df[df.duplicated(['Key', 'Mode'], keep=False)]
+        # sorts similar_key according to alphabetical 'key'
         similar_key_sorted = similar_key.sort_values(by=['Key'])
 
-        return similar_key_sorted
+        return similar_key_sorted  # returns edited dataframe of tracks that share key and mode with another track
 
 
 '''
@@ -392,13 +406,13 @@ def center_tkinter_window():  # Centers window on any display
     window_width = base.winfo_reqwidth()  # gets width of tk window
     window_height = base.winfo_reqheight()  # gets height of tk window
 
-    posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)
-    posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)
+    posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)  # calculates x coordinate of window on launch
+    posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)  # calculates y coordinate of window on launch
 
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=(base.winfo_reqheight() + 200), width=(base.winfo_reqwidth() + 200))  # gives minimum size in px
     base.resizable(False, False)  # disables ability to resize window if FALSE
-    # base.wm_attributes('-topmost', 1)  # always on top
+    # base.wm_attributes('-topmost', 1)  # if enable, window is always on top
 
 
 center_tkinter_window()
@@ -408,27 +422,21 @@ choices = ['Artist', 'Album', 'Track']  # dictionary of options
 choice.set('Option')  # set the default option
 
 
-# on change dropdown value
+# IGNORE IDE COMMENTS
 # noinspection PyUnusedLocal
-def get_change_dropdown(*args):
-    dropdown_option_GUI = str(choice.get().lower())
+def get_change_dropdown(*args):  # on change dropdown value
+    dropdown_option_GUI = str(choice.get().lower())  # gets selected list option from dropdown_menu
+    # edits search_field_label every change
+    # If artist, search_field_label reads 'What artist would you like to search for?'
+    # If album, search_field_label reads 'What album would you like to search for?'
+    # If track, search_field_label reads 'What track would you like to search for?'
     search_field_label['text'] = f"What {dropdown_option_GUI} would you like to search for?"
-
-    # if dropdown_option_GUI == 'track':
-    #     search_field_label_track_2 = tk.Label(base, text="What is the second track you like to search for?")
-    #     search_field_label_track_2.place(relx=0.8, rely=0.4, anchor='center')
-    #
-    #     search_field_entry_track_2 = tk.Entry(base)
-    #     search_field_entry_track_2.place(relx=0.8, rely=0.45, anchor='center')
-    #
-    # else:
-    #     pass
-
     return dropdown_option_GUI
 
 
 choice.trace('w', get_change_dropdown)  # link function to change dropdown
 
+# Main window widgets
 popupMenu_label = tk.Label(base, text="Choose an option from the list below")
 popupMenu_label.place(relx=0.5, rely=0.1, anchor='center')
 
@@ -447,6 +455,7 @@ login.place(relx=0.5, rely=0.55, anchor='center')
 execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
 execute.place(relx=0.5, rely=0.75, anchor='center')
 
+# variable setting
 dropdown_option = None
 search_field = None
 
@@ -461,17 +470,23 @@ def web_launch():  # using the pywebiew module to launch a lightweight chromium-
 
 
 def output_results_to_GUI(df_track_info_merged, df_similar_key):
+    # outputs results from dataframe to tkinter in tabulated format
     show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
     show_result_window.place(relx=0.5, rely=0.9, anchor='center')
 
+    # sets font to be used in tkinter window, courier is used because it is mono width
     courierNew = font.Font(family='Courier New', size=12, weight='normal')
 
     def make_newWindow():
+        # creates a new window when show_result_window is clicked
+
         # tabulate option setting
         tabulate.PRESERVE_WHITESPACE = False
 
+        # creates a new tkinter window called newWindow
         newWindow = tk.Toplevel(base)
 
+        # using tabulate to format dataframe in pretty format for tkinter
         GUI_output_full_result = tk.Label(
             newWindow,
             text=(tabulate(
@@ -492,6 +507,7 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             font=courierNew
         )
 
+        # using tabulate to format dataframe in pretty format for tkinter
         GUI_output_similar_key = tk.Label(
             newWindow,
             text=(tabulate(
@@ -503,71 +519,72 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             font=courierNew
         )
 
-        # print(df_similar_key['Name'].to_string(index=False))
-
-        width = (GUI_output_full_result.winfo_reqwidth())
+        width = (GUI_output_full_result.winfo_reqwidth())  # gets width of table
+        # gets height of all widgets combined
         height = (
                 GUI_output_full_result.winfo_reqheight() +
                 GUI_output_similar_key.winfo_reqheight() +
                 GUI_output_following_songs.winfo_reqheight()
         )
 
-        newWindow.geometry('%dx%d' % (width, height))
+        newWindow.geometry('%dx%d' % (width, height))  # sets px size of window
         newWindow.resizable(False, False)  # disables ability to resize window if FALSE
         newWindow.wm_attributes('-topmost', 1)  # always on top
 
+        # "packs" widgets into grid in relation to side, in this case top down
         GUI_output_full_result.pack(side=tk.TOP)
         GUI_output_following_songs.pack(side=tk.TOP)
         GUI_output_similar_key.pack(side=tk.TOP)
 
 
-def get_search_field_entry():
+def get_search_field_entry():  # gets current input into search_field_entry
     search_field_GUI = str(search_field_entry.get())
-    return search_field_GUI
+    return search_field_GUI  # returns string
 
 
-def send_GUI_query_to_backend():
+def send_GUI_query_to_backend():  # gets current dropdown menu option selected and currently inputted search_field
     global dropdown_option, search_field
     dropdown_option = get_change_dropdown()
     search_field = get_search_field_entry()
     return dropdown_option, search_field
 
 
-def invoke_from_frontend():
+def invoke_from_frontend():  # all interaction between backend and frontend passes through here
     send_GUI_query_to_backend()
     # TODO search_field validation
     if search_field is not None and search_field != '' and dropdown_option != 'option':
-        SearchEngine_invoke = SearchEngine()
-        TrackInfo_invoke = TrackInfo()
+        SearchEngine_invoke = SearchEngine()  # intializes SearchEngine class
+        TrackInfo_invoke = TrackInfo()  # initializes TrackInfo class
+        # passes search_field and dropdown_option from send_GUI_query_to_backend to make_search_query
         search_2 = SearchEngine_invoke.make_search_query(
             search_field_query=search_field,
             search_type_query=dropdown_option
         )
         if dropdown_option == 'artist':
-            response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)
-            response_data = response.json()
-            tracklist = SearchEngine_invoke.list_artist_top_10_GUI(response_data)
-            TrackInfo_invoke.get_artist_top_track_ids(response_data)
+            response = SearchEngine_invoke.get_artist_top_tracks(response_search_query=search_2)  # gets response object
+            response_data = response.json()  # parses as json format
+            tracklist = SearchEngine_invoke.list_artist_top_10_GUI(response_data)  # gets a string list of tracks
+            TrackInfo_invoke.get_artist_top_track_ids(response_data)  # gets ids for every track
 
             df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
             df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
             output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'album':
-            response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)
-            response_data = response.json()
-            tracklist = SearchEngine_invoke.list_album_tracklist(response_data)
-            TrackInfo_invoke.get_album_tracklist_ids(response_data)
+            response = SearchEngine_invoke.get_album_tracklist(response_search_query=search_2)  # gets response object
+            response_data = response.json()  # parses as json format
+            tracklist = SearchEngine_invoke.list_album_tracklist(response_data)  # gets a string list of tracks
+            TrackInfo_invoke.get_album_tracklist_ids(response_data)  # gets ids for every track
 
             df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
             df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
             output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'track':
-            response = SearchEngine_invoke.get_track(response_search_query=search_2)
-            response_data = response.json()
-            tracklist = SearchEngine_invoke.list_track(response_data)
-            TrackInfo_invoke.get_track_id(response_data)
+            response = SearchEngine_invoke.get_track(response_search_query=search_2)  # gets response object
+            response_data = response.json()  # parses as json format
+            tracklist = SearchEngine_invoke.list_track(response_data)  # gets a string list of tracks
+            TrackInfo_invoke.get_track_id(response_data)  # gets ids for every track
 
             df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
             df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
@@ -576,8 +593,10 @@ def invoke_from_frontend():
         else:
             pass  # TODO change pass for something useful
     elif search_field is None or search_field == '':
+        # warning popup if search_field not set
         tk.messagebox.showwarning(title='Warning', message="Search invalid")
     elif dropdown_option == 'option':
+        # warning popup if dropdown_option not set
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
     else:
         pass  # TODO change pass for something useful
