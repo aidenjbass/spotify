@@ -473,6 +473,15 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             font='Courier'
         )
 
+        GUI_output_following_songs = tk.Label(
+            newWindow,
+            text="The following songs with the same key and mode are suitable to be remixed together. "
+                 "\n"
+                 "Those with equal or similar 'danceability' and 'energy' values are even more so suitable"
+                 "",
+            font='Courier'
+        )
+
         GUI_output_similar_key = tk.Label(
             newWindow,
             text=(tabulate(
@@ -484,16 +493,21 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             font='Courier'
         )
 
-        print(df_similar_key['Name'].to_string(index=False))
+        # print(df_similar_key['Name'].to_string(index=False))
 
         width = (GUI_output_full_result.winfo_reqwidth())
-        height = (GUI_output_full_result.winfo_reqheight() + GUI_output_similar_key.winfo_reqheight())
+        height = (
+                GUI_output_full_result.winfo_reqheight() +
+                GUI_output_similar_key.winfo_reqheight() +
+                GUI_output_following_songs.winfo_reqheight()
+        )
 
         newWindow.geometry('%dx%d' % (width, height))
         newWindow.resizable(False, False)  # disables ability to resize window if FALSE
         newWindow.wm_attributes('-topmost', 1)  # always on top
 
         GUI_output_full_result.pack(side=tk.TOP)
+        GUI_output_following_songs.pack(side=tk.TOP)
         GUI_output_similar_key.pack(side=tk.TOP)
 
 
@@ -556,3 +570,4 @@ def invoke_from_frontend():
 
 
 base.mainloop()
+
