@@ -490,7 +490,7 @@ def send_GUI_query_to_backend():
 
 def invoke_from_frontend():
     send_GUI_query_to_backend()
-    # if search_field has * - + it is invalid and raise error, new input ask from user, otherwise continue
+    # TODO search_field validation
     if search_field is not None and search_field != '' and dropdown_option != 'option':
         SearchEngine_invoke = SearchEngine()
         TrackInfo_invoke = TrackInfo()
@@ -525,13 +525,13 @@ def invoke_from_frontend():
             TrackInfo_invoke.get_track_id(response_data)
             TrackInfo_invoke.get_track_info(response_data)
         else:
-            pass
+            pass  # TODO change pass for something useful
     elif search_field is None or search_field == '':
         tk.messagebox.showwarning(title='Warning', message="Search invalid")
     elif dropdown_option == 'option':
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
     else:
-        pass
+        pass  # TODO change pass for something useful
 
 
 base.mainloop()
