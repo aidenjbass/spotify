@@ -145,7 +145,6 @@ class SearchEngine(object):
     @staticmethod
     def list_track(response_data):
         track_name = response_data['name']
-        print(track_name)
         return track_name
 
     def get_search_header(self):
@@ -242,7 +241,6 @@ class TrackInfo(object):
             top_ids = response_data['tracks'][i]['id']
             form_top_ids += str(top_ids + ',')
 
-        # print(form_top_ids)
         return form_top_ids
 
     @staticmethod
@@ -252,7 +250,6 @@ class TrackInfo(object):
             tracklist_ids = response_data['items'][i]['id']
             form_tracklist_id += str(tracklist_ids + ',')
 
-        # print(form_tracklist_id)
         return form_tracklist_id
 
     @staticmethod
@@ -284,7 +281,7 @@ class TrackInfo(object):
             track_info_url,
             headers=self.form_header()
         )
-        # print(track_info_request.json())
+
         return track_info_request.json()
 
     def print_track_audio_features(self, response_data, tracklist):
@@ -364,7 +361,7 @@ class TrackInfo(object):
     def track_info_key_comparison(df):
         similar_key = df[df.duplicated(['key'], keep=False)]
         similar_key_sorted = similar_key.sort_values(by=['key'])
-        # print(similar_key_sorted)
+
         return similar_key_sorted
 
 
