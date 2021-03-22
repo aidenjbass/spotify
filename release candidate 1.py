@@ -398,10 +398,13 @@ class TrackInfo(object):
         # converts the track duration in milliseconds to HH:MM:SS format, creates new column 'track length'
         df_track_info_merged['Track Length'] = pd.to_datetime(
             df_track_info_merged['duration_ms'], unit='ms').dt.strftime('%H:%M:%S').str[:]
+
         # deletes column named 'duration_ms' from dataframe
         df_track_info_drop_duration = df_track_info_merged.drop(columns=['duration_ms'])
+
         # renames 'time_signature' to 'Time Signature'
         df_track_info_rename_ts = df_track_info_drop_duration.rename(columns={'time_signature': 'Time Signature'})
+
         # capitalizes all column header names
         df_track_info_caps = df_track_info_rename_ts.rename(str.capitalize, axis='columns')
         return df_track_info_caps  # returns final dataframe
@@ -425,8 +428,10 @@ base = tk.Tk()  # root window
 def center_tkinter_window():  # Centers window on any display
     window_width = base.winfo_reqwidth()  # gets width of tk window
     window_height = base.winfo_reqheight()  # gets height of tk window
+
     posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)  # calculates x coordinate of window on launch
     posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)  # calculates y coordinate of window on launch
+
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=(base.winfo_reqheight() + 200), width=(base.winfo_reqwidth() + 200))  # gives minimum size in px
     base.resizable(False, False)  # disables ability to resize window if FALSE
