@@ -287,6 +287,7 @@ class TrackInfo(object):
     def print_track_audio_features(self, response_data, tracklist):
         # pandas option setting
         pd.set_option('display.max_columns', None)
+        pd.set_option('mode.chained_assignment', None)
 
         data = io.StringIO(tracklist)
         df_track_names = pd.read_csv(
@@ -358,8 +359,8 @@ class TrackInfo(object):
         return df_track_info_merged_round
 
     @staticmethod
-    def track_info_key_comparison(df):
-        similar_key = df[df.duplicated(['key'], keep=False)]
+    def track_info_comparison(df):
+        similar_key = df[df.duplicated(['key', 'mode'], keep=False)]
         similar_key_sorted = similar_key.sort_values(by=['key'])
 
         return similar_key_sorted
@@ -505,7 +506,7 @@ def invoke_from_frontend():
             TrackInfo_invoke.get_artist_top_track_ids(response_data)
 
             df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
-            df_similar_key = TrackInfo_invoke.track_info_key_comparison(df=df_track_info)
+            df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
             output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'album':
@@ -515,7 +516,7 @@ def invoke_from_frontend():
             TrackInfo_invoke.get_album_tracklist_ids(response_data)
 
             df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
-            df_similar_key = TrackInfo_invoke.track_info_key_comparison(df=df_track_info)
+            df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
             output_results_to_GUI(df_track_info, df_similar_key)
 
         elif dropdown_option == 'track':
