@@ -63,6 +63,7 @@ class ClientAuth(object):  # this class is just for the client authentication
         # returns the base64 string
         client_id = self.client_id
         client_secret = self.client_secret
+
         if client_id is None or client_secret is None:
             raise Exception("client_id or client_secret not set")
 
@@ -87,12 +88,14 @@ class ClientAuth(object):  # this class is just for the client authentication
         access_token_url = self.token_url
         token_data = self.get_token_data()
         token_headers = self.get_token_header()
+
         # calls API to retrieve the client token used throughout the program later on to interact with API
         json_response_token = requests.post(
             access_token_url,
             data=token_data,
             headers=token_headers
         )
+
         valid_request = json_response_token.status_code in range(200, 299)  # anything outside this range is invalid
 
         if valid_request is False:  # raises exception in console
