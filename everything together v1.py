@@ -175,7 +175,7 @@ class SearchEngine(object):
         )
         return response_search_query
 
-    def form_header_results(self):  # shouldn't be static
+    def form_header_results(self):
         return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
