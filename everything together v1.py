@@ -3,6 +3,7 @@ import base64
 import datetime
 import io
 import tkinter as tk
+from tkinter import font
 from tkinter import messagebox
 from urllib.parse import urlencode
 
@@ -456,6 +457,8 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
     show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
     show_result_window.place(relx=0.5, rely=0.9, anchor='center')
 
+    courierNew = font.Font(family='Courier New', size=12, weight='normal')
+
     def make_newWindow():
         # tabulate option setting
         tabulate.PRESERVE_WHITESPACE = False
@@ -470,16 +473,16 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
                 headers='keys',
                 tablefmt='psql'
             )),
-            font='Courier'
+            font=courierNew
         )
 
         GUI_output_following_songs = tk.Label(
             newWindow,
-            text="The following songs with the same key and mode are suitable to be remixed together. "
+            text="The following songs with the same key and mode are suitable to be remixed together"
                  "\n"
-                 "Those with equal or similar 'danceability' and 'energy' values are even more so suitable"
+                 "Those with equal or similar 'danceability' and 'energy' values are even more suitable"
                  "",
-            font='Courier'
+            font=courierNew
         )
 
         GUI_output_similar_key = tk.Label(
@@ -490,7 +493,7 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
                 headers='keys',
                 tablefmt='psql'
             )),
-            font='Courier'
+            font=courierNew
         )
 
         # print(df_similar_key['Name'].to_string(index=False))
@@ -570,4 +573,3 @@ def invoke_from_frontend():
 
 
 base.mainloop()
-
