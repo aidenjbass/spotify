@@ -47,27 +47,27 @@ class ClientAuth(object):  # this class is just for the client authentication
 
     # constant setting
     token = None
-    token_expires_at = datetime.datetime.now()
+    token_expires_at = datetime.datetime.now()  # gets time NOW
     token_has_expired = True
-    token_url = 'https://accounts.spotify.com/api/token'
+    token_url = 'https://accounts.spotify.com/api/token'  # endpoint given by API
 
     # client_id and and client_secret are now constants stored in the external file secrets.py
     client_id = None
     client_secret = None
 
-    def __init__(self, client_id, client_secret):
+    def __init__(self, client_id, client_secret):  # intialises self, passing client_id and client_secret into class
         self.client_id = client_id
         self.client_secret = client_secret
 
-    def get_client_credentials(self):
+    def get_client_credentials(self):  # forms client_credentials as required by API
         # returns the base64 string
         client_id = self.client_id
         client_secret = self.client_secret
         if client_id is None or client_secret is None:
             raise Exception("client_id or client_secret not set")
         else:  # encodes the credentials in base64 encoding rather than UTF, which is required by the API
-            client_credentials = f'{client_id}:{client_secret}'
-            client_credentials_base64 = base64.b64encode(client_credentials.encode())
+            client_credentials = f'{client_id}:{client_secret}'  # f string that combines two vars together
+            client_credentials_base64 = base64.b64encode(client_credentials.encode())  # base64 encodes client_creds
             return client_credentials_base64.decode()
 
     @staticmethod  # a static method that simply stores the grant_type required by the API
@@ -77,9 +77,8 @@ class ClientAuth(object):  # this class is just for the client authentication
         }
 
     def get_token_header(self):  # combines the authorization type and header data needed by the API
-        client_credentials_base64 = self.get_client_credentials()
         return {
-            'Authorization': f'Basic {client_credentials_base64}'
+            'Authorization': f'Basic {self.get_client_credentials()}'
         }
 
     def authenticate(self):
@@ -94,23 +93,23 @@ class ClientAuth(object):  # this class is just for the client authentication
             headers=token_headers
         )
         valid_request = json_response_token.status_code in range(200, 299)  # anything outside this range is invalid
-        if valid_request is False:
+        if valid_request is False:  # raises exception in console
             raise Exception("Authentication failed")
         else:
             response_data = json_response_token.json()
-            now = datetime.datetime.now()
-            token = response_data['access_token']
+            now = datetime.datetime.now()  # gets time now
+            token = response_data['access_token']  # response_data is a json, gets access_token item
             expires_in = response_data['expires_in']  # in seconds, will typically give a value of 3600 seconds
-            expires_at = now + datetime.timedelta(seconds=expires_in)
-            self.token = token
-            self.token_expires_at = expires_at
-            self.token_has_expired = expires_at < now
+            expires_at = now + datetime.timedelta(seconds=expires_in)  # calculates time at which token expires
+            self.token = token  # passes to class
+            self.token_expires_at = expires_at  # passes to class
+            self.token_has_expired = expires_at < now  # gives boolean
             return True
 
-    def get_access_token(self):
+    def get_access_token(self):  # actually gets token when function is called outside of class
         token = self.token
         expires_at = self.token_expires_at  # gives the DD/MM/YYYY HH:MM:SS format of when token expires
-        now = datetime.datetime.now()
+        now = datetime.datetime.now()  # gets time now
         if expires_at < now:  # if when the token expires is before NOW, token is invalid and must be re-authenticated
             self.authenticate()
             return self.get_access_token()
@@ -122,53 +121,55 @@ class ClientAuth(object):  # this class is just for the client authentication
 
 
 class SearchEngine(object):
-    InvokeAuthFromClient = ClientAuth(cid, secret)
+    InvokeAuthFromClient = ClientAuth(cid, secret)  # initializes ClientAuth and passes cid and secret in
 
     def __init__(self):
         pass
 
     @staticmethod
-    def list_artist_top_10_GUI(response_data):
+    def list_artist_top_10_GUI(response_data):  # lists an artists top ten songs
         form_top = ''
-        for i in range(10):
-            top = response_data['tracks'][i]['name']
-            form_top = str(f'{form_top}{top}\n')
+        for i in range(10):  # TODO change to range(len) as some users may not have 10 songs released
+            top = response_data['tracks'][i]['name']  # response_data is json, gets name of each track
+            form_top = str(f'{form_top}{top}\n')  # iterates on previous string
         return form_top
 
     @staticmethod
-    def list_album_tracklist(response_data):
+    def list_album_tracklist(response_data):  # lists names of all tracks in an album
         form_tracklist = ''
-        for i in range(len(response_data['items'])):
-            tracklist = response_data['items'][i]['name']
-            form_tracklist = str(f'{form_tracklist}{tracklist}\n')
+        for i in range(len(response_data['items'])):  # gets i amount of tracks in album, loops i amount of times
+            tracklist = response_data['items'][i]['name']  # response_data is json, gets name of each track
+            form_tracklist = str(f'{form_tracklist}{tracklist}\n')  # iterates on previous string
         return form_tracklist
 
     @staticmethod
-    def list_track(response_data):
-        track_name = response_data['name']
+    def list_track(response_data):  # lists name of individual track
+        track_name = response_data['name']  # response_data is json, gets name
         return track_name
 
-    def get_search_header(self):
+    def get_search_header(self):  # forms the HTTP header needed for search engine
         return {
             'Authorization': f'Bearer {self.InvokeAuthFromClient.get_access_token()}'
         }
 
     @staticmethod
-    def get_search_endpoint():
+    def get_search_endpoint():  # returns URL endpoint needed for search
         endpoint = 'https://api.spotify.com/v1/search'  # API endpoint to search API
         return endpoint
 
+    # variable setting
     search_field_query = None
     search_type_query = None
 
     def make_search_query(self, search_field_query, search_type_query):
         # parses search_query with option category and chosen search from option category
+        # creates dict style ready for HTTP requests using urlencode
         search_query = urlencode({
             'q': f'{search_field_query}',
             'type': f'{search_type_query}',
             'limit': '1'
         })
-        lookup_url = f'{self.get_search_endpoint()}?{search_query}'
+        lookup_url = f'{self.get_search_endpoint()}?{search_query}'  # forms URL of HTTP request
         # interacts with Spotify API and retrieves the top search query
         response_search_query = requests.get(
             lookup_url,
@@ -176,7 +177,7 @@ class SearchEngine(object):
         )
         return response_search_query
 
-    def form_header_results(self):
+    def form_header_results(self):  # forms header for track(s) 'audio_features' endpoint
         return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
@@ -185,48 +186,54 @@ class SearchEngine(object):
 
     def get_artist_top_tracks(self, response_search_query):
         response_artist_search = response_search_query.json()
-        artist_id = response_artist_search['artists']['items'][0]['id']
+        artist_id = response_artist_search['artists']['items'][0]['id']  # gets artist id
         # GET https://api.spotify.com/v1/artists/{id}/top-tracks
-        endpoint = 'https://api.spotify.com/v1/artists'
+        endpoint = 'https://api.spotify.com/v1/artists'  # endpoint for artist search
+        # URL encoded dict for HTTP request, not required but advised
         market = urlencode({
             'market': 'US'
         })
-        artist_top_tracks_url = f'{endpoint}/{artist_id}/top-tracks?{market}'
+        artist_top_tracks_url = f'{endpoint}/{artist_id}/top-tracks?{market}'  # forms URL
+        # makes HTTP request to return an artists up to top 10
         artist_top_tracks_request = requests.get(
             artist_top_tracks_url,
             headers=self.form_header_results()
         )
-        return artist_top_tracks_request
+        return artist_top_tracks_request  # returns artist top 10 tracks
 
     def get_album_tracklist(self, response_search_query):
         response_album_search = response_search_query.json()
-        album_id = response_album_search['albums']['items'][0]['id']
+        album_id = response_album_search['albums']['items'][0]['id']  # gets id of album
         # GET https://api.spotify.com/v1/albums/{id}/tracks
-        endpoint = 'https://api.spotify.com/v1/albums'
+        endpoint = 'https://api.spotify.com/v1/albums'  # album endpoint given by API
+        # URL encoded dict for HTTP request, not required but advised
         market = urlencode({
             'market': 'US'
         })
-        album_listing_url = f'{endpoint}/{album_id}/tracks?{market}'
+        album_listing_url = f'{endpoint}/{album_id}/tracks?{market}'  # forms URL
+        # makes HTTP request to return album information
         album_listing_request = requests.get(
             album_listing_url,
             headers=self.form_header_results()
         )
-        return album_listing_request
+        return album_listing_request  # returns album tracklist
 
     def get_track(self, response_search_query):
         response_track_search = response_search_query.json()
-        track_id = response_track_search['tracks']['items'][0]['id']
+        track_id = response_track_search['tracks']['items'][0]['id']  # gets track id
         # GET https://api.spotify.com/v1/tracks/{id}
-        endpoint = 'https://api.spotify.com/v1/tracks/'
+        endpoint = 'https://api.spotify.com/v1/tracks/'  # tracks endpoint given by API
+        # URL encoded dict for HTTP request, not required but advised
         market = urlencode({
             'market': 'US'
         })
-        track_listing_url = f'{endpoint}{track_id}?{market}'
+        track_listing_url = f'{endpoint}{track_id}?{market}'  # forms URL
+        # makes HTTP request to return track information
         track_listing_request = requests.get(
             track_listing_url,
             headers=self.form_header_results()
         )
-        return track_listing_request
+        return track_listing_request  # returns track
 
 
 class TrackInfo(object):
@@ -242,7 +249,7 @@ class TrackInfo(object):
             top_ids = response_data['tracks'][i]['id']
             form_top_ids += str(top_ids + ',')
 
-        return form_top_ids
+        return form_top_ids  # returns a string of an artist top 10 track UID's separated by comma
 
     @staticmethod
     def get_album_tracklist_ids(response_data):
@@ -251,14 +258,14 @@ class TrackInfo(object):
             tracklist_ids = response_data['items'][i]['id']
             form_tracklist_id += str(tracklist_ids + ',')
 
-        return form_tracklist_id
+        return form_tracklist_id  # returns a string of an albums track UID's separated by comma
 
     @staticmethod
     def get_track_id(response_data):
         track_id = response_data['id']
-        return track_id
+        return track_id  # returns an individual track id
 
-    def form_header(self):
+    def form_header(self):  # forms header used in requests to audio_features endpoint of API
         return {
             'Accept': 'application/json',
             'Content_Type': 'application/json',
@@ -559,9 +566,13 @@ def invoke_from_frontend():
         elif dropdown_option == 'track':
             response = SearchEngine_invoke.get_track(response_search_query=search_2)
             response_data = response.json()
-            SearchEngine_invoke.list_track(response_data)
+            tracklist = SearchEngine_invoke.list_track(response_data)
             TrackInfo_invoke.get_track_id(response_data)
-            TrackInfo_invoke.get_track_info(response_data)
+
+            df_track_info = TrackInfo_invoke.print_track_audio_features(response_data, tracklist)
+            df_similar_key = TrackInfo_invoke.track_info_comparison(df=df_track_info)
+            output_results_to_GUI(df_track_info, df_similar_key)
+
         else:
             pass  # TODO change pass for something useful
     elif search_field is None or search_field == '':
