@@ -308,7 +308,7 @@ class TrackInfo(object):
             right_index=True
         )
 
-        df_track_info_merged_cats = (df_track_info_merged[[
+        df_track_info_merged = (df_track_info_merged[[
             'name',
             'danceability',
             'energy',
@@ -329,7 +329,7 @@ class TrackInfo(object):
             'time_signature'
         ]])
 
-        df_track_info_merged_cats['key'] = df_track_info_merged_cats['key'].map({
+        df_track_info_merged['key'] = df_track_info_merged['key'].map({
             0: 'C',
             1: 'C#',
             2: 'D',
@@ -345,23 +345,30 @@ class TrackInfo(object):
 
         })
 
-        df_track_info_merged_cats['mode'] = df_track_info_merged_cats['mode'].map({
+        df_track_info_merged['mode'] = df_track_info_merged['mode'].map({
             0: 'Minor',
             1: 'Major'
         })
 
-        df_track_info_merged_round = df_track_info_merged_cats.round({
+        df_track_info_merged = df_track_info_merged.round({
             'danceability': 1,
             'energy': 1,
             'tempo': 0
         })
 
-        return df_track_info_merged_round
+        df_track_info_merged['Track Length'] = pd.to_datetime(df_track_info_merged['duration_ms'],
+                                                              unit='ms').dt.strftime('%H:%M:%S').str[:]
+
+        df_track_info_drop_duration = df_track_info_merged.drop(columns=['duration_ms'])
+        df_track_info_rename_ts = df_track_info_drop_duration.rename(columns={'time_signature': 'Time Signature'})
+        df_track_info_caps = df_track_info_rename_ts.rename(str.capitalize, axis='columns')
+
+        return df_track_info_caps
 
     @staticmethod
     def track_info_comparison(df):
-        similar_key = df[df.duplicated(['key', 'mode'], keep=False)]
-        similar_key_sorted = similar_key.sort_values(by=['key'])
+        similar_key = df[df.duplicated(['Key', 'Mode'], keep=False)]
+        similar_key_sorted = similar_key.sort_values(by=['Key'])
 
         return similar_key_sorted
 
@@ -377,12 +384,12 @@ def center_tkinter_window():  # Centers window on any display
     window_width = base.winfo_reqwidth()  # gets width of tk window
     window_height = base.winfo_reqheight()  # gets height of tk window
 
-    posx = int(base.winfo_screenwidth() / 3.8 - window_width / 2)
-    posy = int(base.winfo_screenheight() / 4 - window_height / 2)
+    posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)
+    posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)
 
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
-    base.config(height=800, width=1200)  # gives minimum size in px
-    base.resizable(True, True)  # disables ability to resize window if FALSE
+    base.config(height=(base.winfo_reqheight() + 200), width=(base.winfo_reqwidth() + 200))  # gives minimum size in px
+    base.resizable(False, False)  # disables ability to resize window if FALSE
     # base.wm_attributes('-topmost', 1)  # always on top
 
 
@@ -398,28 +405,39 @@ choice.set('Option')  # set the default option
 def get_change_dropdown(*args):
     dropdown_option_GUI = str(choice.get().lower())
     search_field_label['text'] = f"What {dropdown_option_GUI} would you like to search for?"
+
+    # if dropdown_option_GUI == 'track':
+    #     search_field_label_track_2 = tk.Label(base, text="What is the second track you like to search for?")
+    #     search_field_label_track_2.place(relx=0.8, rely=0.4, anchor='center')
+    #
+    #     search_field_entry_track_2 = tk.Entry(base)
+    #     search_field_entry_track_2.place(relx=0.8, rely=0.45, anchor='center')
+    #
+    # else:
+    #     pass
+
     return dropdown_option_GUI
 
 
 choice.trace('w', get_change_dropdown)  # link function to change dropdown
 
 popupMenu_label = tk.Label(base, text="Choose an option from the list below")
-popupMenu_label.place(relx=0.2, rely=0.2, anchor='center')
+popupMenu_label.place(relx=0.5, rely=0.1, anchor='center')
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
-popupMenu.place(relx=0.2, rely=0.25, anchor='center')
+popupMenu.place(relx=0.5, rely=0.16, anchor='center')
 
 search_field_label = tk.Label(base, text="What would you like to search for?")
-search_field_label.place(relx=0.2, rely=0.4, anchor='center')
+search_field_label.place(relx=0.5, rely=0.35, anchor='center')
 
 search_field_entry = tk.Entry(base)
-search_field_entry.place(relx=0.2, rely=0.45, anchor='center')
+search_field_entry.place(relx=0.5, rely=0.4, anchor='center')
 
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
-login.place(relx=0.2, rely=0.7, anchor='center')
+login.place(relx=0.5, rely=0.55, anchor='center')
 
 execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
-execute.place(relx=0.2, rely=0.9, anchor='center')
+execute.place(relx=0.5, rely=0.75, anchor='center')
 
 dropdown_option = None
 search_field = None
@@ -428,7 +446,7 @@ search_field = None
 def web_launch():  # using the pywebiew module to launch a lightweight chromium-based browser within python
     webview.create_window(
         title="Spotify User Authentication",
-        url='http://google.com',
+        url='http://accounts.spotify.com',
         confirm_close=False
     )
     webview.start()
@@ -436,7 +454,7 @@ def web_launch():  # using the pywebiew module to launch a lightweight chromium-
 
 def output_results_to_GUI(df_track_info_merged, df_similar_key):
     show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
-    show_result_window.place(relx=0.5, rely=0.5, anchor='center')
+    show_result_window.place(relx=0.5, rely=0.9, anchor='center')
 
     def make_newWindow():
         # tabulate option setting
@@ -465,6 +483,8 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             )),
             font='Courier'
         )
+
+        print(df_similar_key['Name'].to_string(index=False))
 
         width = (GUI_output_full_result.winfo_reqwidth())
         height = (GUI_output_full_result.winfo_reqheight() + GUI_output_similar_key.winfo_reqheight())
