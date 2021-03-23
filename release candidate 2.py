@@ -403,13 +403,13 @@ class TrackInfo(object):
         # deletes column named 'duration_ms' from dataframe
         df_track_info_drop_duration = df_track_info_merged.drop(columns=['duration_ms'])
 
-        # renames 'time_signature' to 'Time Signature'
-        df_track_info_rename_ts = df_track_info_drop_duration.rename(columns={'time_signature': 'Time Signature'})
-
         # capitalizes all column header names
-        df_track_info_caps = df_track_info_rename_ts.rename(str.capitalize, axis='columns')
+        df_track_info_caps = df_track_info_drop_duration.rename(str.capitalize, axis='columns')
 
-        return df_track_info_caps  # returns final dataframe
+        # renames 'time_signature' to 'Time Signature'
+        df_track_info_rename_ts = df_track_info_caps.rename(columns={'time_signature': 'Time Signature'})
+
+        return df_track_info_rename_ts  # returns final dataframe
 
     @staticmethod
     def track_info_comparison(df):
@@ -437,9 +437,11 @@ def center_tkinter_window():  # Centers window on any display
     posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)  # calculates x coordinate of window on launch
     posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)  # calculates y coordinate of window on launch
 
+    base.title('Song Feature Finder')
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
-    base.config(height=(base.winfo_reqheight() + 500), width=(base.winfo_reqwidth() + 500))  # gives minimum size in px
-    base.resizable(True, True)  # disables ability to resize window if FALSE
+    base.config(height=500, width=500)  # gives minimum size in px
+    base.resizable(False, False)  # disables ability to resize window if FALSE
+    base.pack_propagate(0)
     # base.wm_attributes('-topmost', 1)  # if enable, window is always on top
 
 
@@ -465,23 +467,64 @@ def get_change_dropdown(*args):  # on change dropdown value
 choice.trace('w', get_change_dropdown)  # link function to change dropdown
 
 # Main window widgets
-popupMenu_label = tk.Label(base, text="Choose an option from the list below")
-popupMenu_label.pack(side=tk.TOP, padx=padx, pady=pady)
+popupMenu_label = tk.Label(
+    base,
+    text="Choose an option from the list below",
+    font=('Segoe UI', 12, 'normal')
+)
+popupMenu_label.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
-popupMenu.pack(side=tk.TOP, padx=padx, pady=pady)
+popupMenu.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
-search_field_label = tk.Label(base, text="What would you like to search for?")
-search_field_label.pack(side=tk.TOP, padx=padx, pady=pady)
+search_field_label = tk.Label(
+    base,
+    text="What would you like to search for?",
+    font=('Segoe UI', 12, 'normal')
+)
+search_field_label.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
 search_field_entry = tk.Entry(base)
-search_field_entry.pack(side=tk.TOP, padx=padx, pady=pady)
+search_field_entry.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
-login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
-login.pack(side=tk.TOP, padx=padx, pady=pady)
+login = tk.Button(
+    base,
+    text="Optionally, login to your account",
+    command=lambda: web_launch(),
+    font=('Segoe UI', 12, 'normal'))
+login.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
-execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
-execute.pack(side=tk.TOP, padx=padx, pady=pady)
+execute = tk.Button(
+    base,
+    text="When ready to search, click me",
+    command=lambda: invoke_from_frontend(),
+    font=('Segoe UI', 12, 'normal')
+)
+execute.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
 
 # variable setting
 dropdown_option = None
@@ -579,14 +622,22 @@ def get_download_path():
 
 def output_results_to_GUI(df_track_info_merged, df_similar_key):
     # outputs results from dataframe to tkinter in tabulated format
-    show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
-    show_result_window.pack(side=tk.TOP, padx=padx, pady=pady)
+    show_result_window = tk.Button(
+        base,
+        text="Click me to open results",
+        command=lambda: make_newWindow(),
+        font=('Segoe UI', 12, 'normal')
+    )
+    show_result_window.pack(
+        side=tk.TOP,
+        padx=padx,
+        pady=pady
+    )
 
     # sets font to be used in tkinter window, courier is used because it is mono width
     courierNew = font.Font(family='Courier New', size=12, weight='normal')
 
     def make_newWindow():
-
         def export_table_1_to_csv():
             directory = f'{get_download_path()}\\df_track_info.csv'
             df_track_info_merged.to_csv(f'{directory}', index=False)
@@ -616,7 +667,8 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
         GUI_output_export_button_1 = tk.Button(
             newWindow,
             text="Output to downloads folder in csv format",
-            command=lambda: export_table_1_to_csv()
+            command=lambda: export_table_1_to_csv(),
+            font=courierNew
         )
 
         GUI_output_following_songs = tk.Label(
@@ -643,7 +695,8 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
         GUI_output_export_button_2 = tk.Button(
             newWindow,
             text="Output to downloads folder in csv format",
-            command=lambda: export_table_2_to_csv()
+            command=lambda: export_table_2_to_csv(),
+            font=courierNew
         )
 
         width = (GUI_output_full_result.winfo_reqwidth())  # gets width of table
