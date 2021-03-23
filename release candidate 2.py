@@ -438,7 +438,7 @@ def center_tkinter_window():  # Centers window on any display
 
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=(base.winfo_reqheight() + 500), width=(base.winfo_reqwidth() + 500))  # gives minimum size in px
-    base.resizable(False, False)  # disables ability to resize window if FALSE
+    base.resizable(True, True)  # disables ability to resize window if FALSE
     # base.wm_attributes('-topmost', 1)  # if enable, window is always on top
 
 
@@ -509,7 +509,7 @@ def send_GUI_query_to_backend():  # gets current dropdown menu option selected a
 
 
 def invoke_from_frontend():  # all interaction between backend and frontend passes through here
-    send_GUI_query_to_backend()  # TODO search_field input validation
+    send_GUI_query_to_backend()
 
     if search_field is not None and search_field != '' and dropdown_option != 'option':
         SearchEngine_invoke = SearchEngine()  # intializes SearchEngine class
