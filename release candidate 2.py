@@ -2,6 +2,7 @@
 import base64
 import datetime
 import io
+import os
 import tkinter as tk
 from tkinter import font
 from tkinter import messagebox
@@ -464,22 +465,22 @@ choice.trace('w', get_change_dropdown)  # link function to change dropdown
 
 # Main window widgets
 popupMenu_label = tk.Label(base, text="Choose an option from the list below")
-popupMenu_label.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+popupMenu_label.pack(side=tk.TOP, padx=padx, pady=pady)
 
 popupMenu = tk.OptionMenu(base, choice, *choices)
-popupMenu.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+popupMenu.pack(side=tk.TOP, padx=padx, pady=pady)
 
 search_field_label = tk.Label(base, text="What would you like to search for?")
-search_field_label.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+search_field_label.pack(side=tk.TOP, padx=padx, pady=pady)
 
 search_field_entry = tk.Entry(base)
-search_field_entry.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+search_field_entry.pack(side=tk.TOP, padx=padx, pady=pady)
 
 login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
-login.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+login.pack(side=tk.TOP, padx=padx, pady=pady)
 
 execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
-execute.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+execute.pack(side=tk.TOP, padx=padx, pady=pady)
 
 # variable setting
 dropdown_option = None
@@ -548,7 +549,7 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
             output_results_to_GUI(df_track_info, df_similar_key)
 
         else:
-            pass  # TODO change pass for something useful
+            pass
 
     elif search_field is None or search_field == '':
         # warning popup if search_field not set
@@ -559,13 +560,26 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
 
     else:
-        pass  # TODO change pass for something useful
+        pass
+
+
+def get_download_path():
+    """Returns the default downloads path for linux or windows"""
+    if os.name == 'nt':
+        import winreg
+        sub_key = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders'
+        downloads_guid = '{374DE290-123F-4565-9164-39C4925E467B}'
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, sub_key) as key:
+            location = winreg.QueryValueEx(key, downloads_guid)[0]
+        return location
+    else:
+        return os.path.join(os.path.expanduser('~'), 'downloads')
 
 
 def output_results_to_GUI(df_track_info_merged, df_similar_key):
     # outputs results from dataframe to tkinter in tabulated format
     show_result_window = tk.Button(base, text="Click me to open results", command=lambda: make_newWindow())
-    show_result_window.pack(side=tk.TOP, ipadx=padx, ipady=pady)
+    show_result_window.pack(side=tk.TOP, padx=padx, pady=pady)
 
     # sets font to be used in tkinter window, courier is used because it is mono width
     courierNew = font.Font(family='Courier New', size=12, weight='normal')
@@ -573,10 +587,12 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
     def make_newWindow():
 
         def export_table_1_to_csv():
-            df_track_info_merged.to_csv('df_track_info_merged.csv', index=False)
+            directory = f'{get_download_path()}\\df_track_info.csv'
+            df_track_info_merged.to_csv(f'{directory}', index=False)
 
         def export_table_2_to_csv():
-            df_similar_key.to_csv('df_track_similar_keys.csv', index=False)
+            directory = f'{get_download_path()}\\df_track_similar_keys.csv'
+            df_similar_key.to_csv(f'{directory}', index=False)
 
         # creates a new window when show_result_window is clicked
         # tabulate option setting
