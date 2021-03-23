@@ -564,7 +564,7 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
 
 
 def get_download_path():
-    """Returns the default downloads path for linux or windows"""
+    # Returns the default downloads path for linux or windows
     if os.name == 'nt':
         import winreg
         sub_key = r'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders'
@@ -658,6 +658,7 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
         newWindow.geometry('%dx%d' % (width, height))  # sets px size of window
         newWindow.resizable(False, False)  # disables ability to resize window if FALSE
         newWindow.wm_attributes('-topmost', 1)  # always on top
+
         # "packs" widgets into grid in relation to side, in this case top down
         GUI_output_full_result.pack(side=tk.TOP)
         GUI_output_export_button_1.pack(side=tk.TOP)
