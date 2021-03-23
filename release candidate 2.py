@@ -409,10 +409,7 @@ class TrackInfo(object):
         # capitalizes all column header names
         df_track_info_caps = df_track_info_rename_ts.rename(str.capitalize, axis='columns')
 
-        # sorts table by key
-        df_sorted_by_key = df_track_info_caps.sort_values(by=['Key'])
-
-        return df_sorted_by_key  # returns final dataframe
+        return df_track_info_caps  # returns final dataframe
 
     @staticmethod
     def track_info_comparison(df):
