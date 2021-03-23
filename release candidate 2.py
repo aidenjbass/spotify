@@ -487,7 +487,7 @@ popupMenu.pack(
 
 search_field_label = tk.Label(
     base,
-    text="What would you like to search for?",
+    text="What option would you like to search for?",
     font=('Segoe UI', 12, 'normal')
 )
 search_field_label.pack(
