@@ -380,15 +380,18 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
             tracklist = SearchEngine_invoke.list_track(response_data)  # gets a string list of tracks
             TrackInfo_invoke.get_track_id(response_data)  # gets ids for every track
         else:
-            pass  # TODO change pass for something useful
+            pass
     elif search_field is None or search_field == '':
         # warning popup if search_field not set
         tk.messagebox.showwarning(title='Warning', message="Search invalid")
     elif dropdown_option == 'option':
         # warning popup if dropdown_option not set
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
+    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
+        # warning popup if dropdown_option not sent and search_field not set
+        tk.messagebox.showwarning(title='Warning', message='Option not chosen and search is invalid')
     else:
-        pass  # TODO change pass for something useful
+        pass
 
 
 base.mainloop()

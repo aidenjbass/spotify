@@ -603,6 +603,10 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
         # warning popup if dropdown_option not set
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
 
+    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
+        # warning popup if dropdown_option not sent and search_field not set
+        tk.messagebox.showwarning(title='Warning', message="Option not chosen and search is invalid")
+
     else:
         pass
 
