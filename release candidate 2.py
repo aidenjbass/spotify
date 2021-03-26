@@ -505,7 +505,7 @@ search_field_entry.pack(
 
 login = tk.Button(
     base,
-    text="Optionally, login to your account",
+    text="Log in to your Spotify account",
     command=lambda: web_launch(),
     font=('Segoe UI', 12, 'normal'))
 login.pack(
@@ -513,6 +513,18 @@ login.pack(
     padx=padx,
     pady=pady
 )
+
+instruction_label = tk.Label(
+    base,
+    text='or',
+    font=('Segoe UI', 12, 'normal')
+)
+instruction_label.pack(
+    side=tk.TOP,
+    padx=padx,
+    pady=pady
+)
+
 
 execute = tk.Button(
     base,
@@ -595,6 +607,10 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
         else:
             pass
 
+    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
+        # warning popup if dropdown_option not sent and search_field not set
+        tk.messagebox.showwarning(title='Warning', message="Option not chosen and search is invalid")
+
     elif search_field is None or search_field == '':
         # warning popup if search_field not set
         tk.messagebox.showwarning(title='Warning', message="Search invalid")
@@ -602,10 +618,6 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
     elif dropdown_option == 'option':
         # warning popup if dropdown_option not set
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
-
-    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
-        # warning popup if dropdown_option not sent and search_field not set
-        tk.messagebox.showwarning(title='Warning', message="Option not chosen and search is invalid")
 
     else:
         pass

@@ -281,7 +281,7 @@ def center_tkinter_window():  # Centers window on any display
     posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)  # calculates y coordinate of window on launch
 
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
-    base.config(height=(base.winfo_reqheight() + 200), width=(base.winfo_reqwidth() + 200))  # gives minimum size in px
+    base.config(height=(base.winfo_reqheight() + 400), width=(base.winfo_reqwidth() + 400))  # gives minimum size in px
     base.resizable(False, False)  # disables ability to resize window if FALSE
     # base.wm_attributes('-topmost', 1)  # if enable, window is always on top
 
@@ -320,10 +320,13 @@ search_field_label.place(relx=0.5, rely=0.35, anchor='center')
 search_field_entry = tk.Entry(base)
 search_field_entry.place(relx=0.5, rely=0.4, anchor='center')
 
-login = tk.Button(base, text="Optionally, login to your account", command=lambda: web_launch())
+login = tk.Button(base, text="Log in to your Spotify account", command=lambda: web_launch())
 login.place(relx=0.5, rely=0.55, anchor='center')
 
-execute = tk.Button(base, text="When ready to search, click me", command=lambda: invoke_from_frontend())
+instruction_label = tk.Label(base, text='or')
+instruction_label.place(relx=0.5, rely=0.65, anchor='center')
+
+execute = tk.Button(base, text="Continue", command=lambda: invoke_from_frontend())
 execute.place(relx=0.5, rely=0.75, anchor='center')
 
 # variable setting
@@ -381,15 +384,15 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
             TrackInfo_invoke.get_track_id(response_data)  # gets ids for every track
         else:
             pass
+    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
+        # warning popup if dropdown_option not sent and search_field not set
+        tk.messagebox.showwarning(title='Warning', message='Option not chosen and search is invalid')
     elif search_field is None or search_field == '':
         # warning popup if search_field not set
         tk.messagebox.showwarning(title='Warning', message="Search invalid")
     elif dropdown_option == 'option':
         # warning popup if dropdown_option not set
         tk.messagebox.showwarning(title='Warning', message="Option not chosen")
-    elif dropdown_option == 'option' and (search_field is None or search_field == ''):
-        # warning popup if dropdown_option not sent and search_field not set
-        tk.messagebox.showwarning(title='Warning', message='Option not chosen and search is invalid')
     else:
         pass
 
