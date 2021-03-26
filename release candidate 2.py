@@ -406,8 +406,14 @@ class TrackInfo(object):
         # capitalizes all column header names
         df_track_info_caps = df_track_info_drop_duration.rename(str.capitalize, axis='columns')
 
-        # renames 'time_signature' to 'Time Signature'
-        df_track_info_rename_ts = df_track_info_caps.rename(columns={'Time_signature': 'Time Signature'})
+        # renames 'time_signature' to 'Time Signature' and 'Track length' to 'Track Length'
+        df_track_info_rename_ts = df_track_info_caps.rename(columns={
+            'Time_signature': 'Time Signature',
+            'Track length': 'Track Length'
+        })
+
+        # correctly formats time signature column
+        df_track_info_rename_ts['Time Signature'] = df_track_info_rename_ts['Time Signature'].astype(str) + ' \\ 4'
 
         return df_track_info_rename_ts  # returns final dataframe
 
