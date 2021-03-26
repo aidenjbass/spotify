@@ -398,9 +398,3 @@ def invoke_from_frontend():  # all interaction between backend and frontend pass
 
 
 base.mainloop()
-
-
-def output_results_to_GUI():
-    # outputs results from dataframe to tkinter in tabulated format
-    show_result_window = tk.Button(base, text="Click me to open results")
-    show_result_window.place(relx=0.5, rely=0.9, anchor='center')

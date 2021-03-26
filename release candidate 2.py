@@ -407,7 +407,7 @@ class TrackInfo(object):
         df_track_info_caps = df_track_info_drop_duration.rename(str.capitalize, axis='columns')
 
         # renames 'time_signature' to 'Time Signature'
-        df_track_info_rename_ts = df_track_info_caps.rename(columns={'time_signature': 'Time Signature'})
+        df_track_info_rename_ts = df_track_info_caps.rename(columns={'Time_signature': 'Time Signature'})
 
         return df_track_info_rename_ts  # returns final dataframe
 
@@ -437,11 +437,11 @@ def center_tkinter_window():  # Centers window on any display
     posx = int(base.winfo_screenwidth() / 2.3 - window_width / 2)  # calculates x coordinate of window on launch
     posy = int(base.winfo_screenheight() / 2.8 - window_height / 2)  # calculates y coordinate of window on launch
 
-    base.title('Song Feature Finder')
+    base.title("Spotify Song Feature Finder")
     base.geometry('+{}+{}'.format(posx, posy))  # position the window center of display
     base.config(height=500, width=500)  # gives minimum size in px
     base.resizable(False, False)  # disables ability to resize window if FALSE
-    base.pack_propagate(0)
+    base.pack_propagate(0)  # ensures size is set by .config rather than the widgets themselves
     # base.wm_attributes('-topmost', 1)  # if enable, window is always on top
 
 
