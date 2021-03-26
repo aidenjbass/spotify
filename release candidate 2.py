@@ -528,7 +528,7 @@ instruction_label.pack(
 
 execute = tk.Button(
     base,
-    text="When ready to search, click me",
+    text='Continue',
     command=lambda: invoke_from_frontend(),
     font=('Segoe UI', 12, 'normal')
 )
@@ -650,10 +650,10 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
         pady=pady
     )
 
-    # sets font to be used in tkinter window, courier is used because it is mono width
+    # sets font to be used in this window, courier is used because it is mono width
     courierNew = font.Font(family='Courier New', size=12, weight='normal')
 
-    def make_newWindow():
+    def make_newWindow():  # creates a new window when show_result_window is clicked
         def export_table_1_to_csv():
             directory = f'{get_download_path()}\\df_track_info.csv'
             df_track_info_merged.to_csv(f'{directory}', index=False)
@@ -662,79 +662,114 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
             directory = f'{get_download_path()}\\df_track_similar_keys.csv'
             df_similar_key.to_csv(f'{directory}', index=False)
 
-        # creates a new window when show_result_window is clicked
         # tabulate option setting
         tabulate.PRESERVE_WHITESPACE = False
         # creates a new tkinter window called newWindow
         newWindow = tk.Toplevel(base)
         # using tabulate to format dataframe in pretty format for tkinter
+        if dropdown_option == 'artist' or 'album':
+            GUI_output_full_result = tk.Label(
+                newWindow,
+                text=(tabulate(
+                    df_track_info_merged,
+                    showindex=False,
+                    headers='keys',
+                    tablefmt='psql'
+                )),
+                font=courierNew
+            )
 
-        GUI_output_full_result = tk.Label(
-            newWindow,
-            text=(tabulate(
-                df_track_info_merged,
-                showindex=False,
-                headers='keys',
-                tablefmt='psql'
-            )),
-            font=courierNew
-        )
+            GUI_output_export_button_1 = tk.Button(
+                newWindow,
+                text="Output to downloads folder in csv format",
+                command=lambda: export_table_1_to_csv(),
+                font=courierNew
+            )
 
-        GUI_output_export_button_1 = tk.Button(
-            newWindow,
-            text="Output to downloads folder in csv format",
-            command=lambda: export_table_1_to_csv(),
-            font=courierNew
-        )
+            GUI_output_following_songs = tk.Label(
+                newWindow,
+                text="The following songs with the same key and mode are suitable to be remixed together"
+                     "\n"
+                     "Those with equal or similar 'danceability' and 'energy' values are even more suitable"
+                     "",
+                font=courierNew
+            )
 
-        GUI_output_following_songs = tk.Label(
-            newWindow,
-            text="The following songs with the same key and mode are suitable to be remixed together"
-                 "\n"
-                 "Those with equal or similar 'danceability' and 'energy' values are even more suitable"
-                 "",
-            font=courierNew
-        )
+            # using tabulate to format dataframe in pretty format for tkinter
+            GUI_output_similar_key = tk.Label(
+                newWindow,
+                text=(tabulate(
+                    df_similar_key,
+                    showindex=False,
+                    headers='keys',
+                    tablefmt='psql'
+                )),
+                font=courierNew
+            )
 
-        # using tabulate to format dataframe in pretty format for tkinter
-        GUI_output_similar_key = tk.Label(
-            newWindow,
-            text=(tabulate(
-                df_similar_key,
-                showindex=False,
-                headers='keys',
-                tablefmt='psql'
-            )),
-            font=courierNew
-        )
+            GUI_output_export_button_2 = tk.Button(
+                newWindow,
+                text="Output to downloads folder in csv format",
+                command=lambda: export_table_2_to_csv(),
+                font=courierNew
+            )
 
-        GUI_output_export_button_2 = tk.Button(
-            newWindow,
-            text="Output to downloads folder in csv format",
-            command=lambda: export_table_2_to_csv(),
-            font=courierNew
-        )
+            width = (GUI_output_full_result.winfo_reqwidth())  # gets width of table
+            # gets height of all widgets combined
+            height = (
+                    GUI_output_full_result.winfo_reqheight() +
+                    GUI_output_export_button_1.winfo_reqheight() +
+                    GUI_output_similar_key.winfo_reqheight() +
+                    GUI_output_following_songs.winfo_reqheight() +
+                    GUI_output_export_button_2.winfo_reqheight()
+            )
 
-        width = (GUI_output_full_result.winfo_reqwidth())  # gets width of table
-        # gets height of all widgets combined
-        height = (
-                GUI_output_full_result.winfo_reqheight() +
-                GUI_output_export_button_1.winfo_reqheight() +
-                GUI_output_similar_key.winfo_reqheight() +
-                GUI_output_following_songs.winfo_reqheight() +
-                GUI_output_export_button_2.winfo_reqheight()
-        )
+            newWindow.geometry('%dx%d' % (width, height))  # sets px size of window
+            newWindow.resizable(False, False)  # disables ability to resize window if FALSE
+            newWindow.wm_attributes('-topmost', 1)  # always on top
 
-        newWindow.geometry('%dx%d' % (width, height))  # sets px size of window
-        newWindow.resizable(False, False)  # disables ability to resize window if FALSE
-        newWindow.wm_attributes('-topmost', 1)  # always on top
+            # "packs" widgets into grid in relation to side, in this case top down
+            GUI_output_full_result.pack(side=tk.TOP)
+            GUI_output_export_button_1.pack(side=tk.TOP)
+            GUI_output_following_songs.pack(side=tk.TOP)
+            GUI_output_similar_key.pack(side=tk.TOP)
+            GUI_output_export_button_2.pack(side=tk.TOP)
 
-        # "packs" widgets into grid in relation to side, in this case top down
-        GUI_output_full_result.pack(side=tk.TOP)
-        GUI_output_export_button_1.pack(side=tk.TOP)
-        GUI_output_following_songs.pack(side=tk.TOP)
-        GUI_output_similar_key.pack(side=tk.TOP)
-        GUI_output_export_button_2.pack(side=tk.TOP)
+        if dropdown_option == 'track':
+            GUI_output_full_result = tk.Label(
+                newWindow,
+                text=(tabulate(
+                    df_track_info_merged,
+                    showindex=False,
+                    headers='keys',
+                    tablefmt='psql'
+                )),
+                font=courierNew
+            )
+
+            GUI_output_export_button_1 = tk.Button(
+                newWindow,
+                text="Output to downloads folder in csv format",
+                command=lambda: export_table_1_to_csv(),
+                font=courierNew
+            )
+
+            width = (GUI_output_full_result.winfo_reqwidth())  # gets width of table
+            # gets height of all widgets combined
+            height = (
+                    GUI_output_full_result.winfo_reqheight() +
+                    GUI_output_export_button_1.winfo_reqheight()
+            )
+
+            newWindow.geometry('%dx%d' % (width, height))  # sets px size of window
+            newWindow.resizable(False, False)  # disables ability to resize window if FALSE
+            newWindow.wm_attributes('-topmost', 1)  # always on top
+
+            # "packs" widgets into grid in relation to side, in this case top down
+            GUI_output_full_result.pack(side=tk.TOP)
+            GUI_output_export_button_1.pack(side=tk.TOP)
 
 
 base.mainloop()
+
+# todo add artist/album name to table
