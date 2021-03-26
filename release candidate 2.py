@@ -139,7 +139,7 @@ class SearchEngine(object):
     @staticmethod
     def list_artist_top_10_GUI(response_data):  # lists an artists top ten songs
         form_top = ''
-        for i in range(10):  # TODO change to range(len) as some users may not have 10 songs released
+        for i in range(10):
             top = response_data['tracks'][i]['name']  # response_data is json, gets name of each track
             form_top = str(f'{form_top}{top}\n')  # iterates on previous string
         return form_top
@@ -777,5 +777,3 @@ def output_results_to_GUI(df_track_info_merged, df_similar_key):
 
 
 base.mainloop()
-
-# todo add artist/album name to table
